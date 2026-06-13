@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>キーワードタイピング練習アプリ</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --color-bg: #ffffff;
+      --color-bg-secondary: #f5f4f0;
+      --color-bg-info: #e6f1fb;
+      --color-text-primary: #1a1a18;
+      --color-text-secondary: #5f5e5a;
+      --color-text-info: #185fa5;
+      --color-border: rgba(0,0,0,0.12);
+      --color-border-md: rgba(0,0,0,0.22);
+      --color-purple-bg: #eeedfe;
+      --color-purple: #534ab7;
+      --color-purple-text: #3c3489;
+      --color-teal-bg: #e1f5ee;
+      --color-teal: #0f6e56;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-bg: #1c1c1a;
+        --color-bg-secondary: #252523;
+        --color-bg-info: #042c53;
+        --color-text-primary: #f0ede8;
+        --color-text-secondary: #b4b2a9;
+        --color-text-info: #85b7eb;
+        --color-border: rgba(255,255,255,0.12);
+        --color-border-md: rgba(255,255,255,0.22);
+        --color-purple-bg: #26215c;
+        --color-purple: #afa9ec;
+        --color-purple-text: #cecbf6;
+        --color-teal-bg: #04342c;
+        --color-teal: #5dcaa5;
+      }
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--color-bg);
+      color: var(--color-text-primary);
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
+    .container { max-width: 720px; margin: 0 auto; }
+
+    /* ---- Hero Banner ---- */
+    .hero-banner {
+      width: 100%;
+    }
+    .hero-banner img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .banner-cta {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      padding: 1.5rem 1.5rem 0;
+    }
+    .cta-group {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      background: var(--color-purple);
+      color: var(--color-purple-bg);
+      border: none;
+      padding: 12px 28px;
+      border-radius: var(--radius-md);
+      font-size: 15px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-primary:hover { opacity: 0.88; }
+    .btn-secondary {
+      background: transparent;
+      color: var(--color-text-primary);
+      border: 0.5px solid var(--color-border-md);
+      padding: 12px 28px;
+      border-radius: var(--radius-md);
+      font-size: 15px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-secondary:hover { background: var(--color-bg-secondary); }
+
+    /* ---- Demo box ---- */
+    .demo-box {
+      margin: 2rem 1.5rem;
+      background: var(--color-bg-secondary);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      border: 0.5px solid var(--color-border);
+    }
+    .demo-label {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      margin-bottom: 8px;
+    }
+    .demo-input-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 1rem;
+    }
+    .demo-input-row input {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+      border: 0.5px solid var(--color-border-md);
+      background: var(--color-bg);
+      color: var(--color-text-primary);
+      font-size: 14px;
+      outline: none;
+    }
+    .demo-input-row input:focus {
+      border-color: var(--color-purple);
+    }
+    .demo-input-row button {
+      padding: 8px 16px;
+      background: var(--color-purple);
+      color: var(--color-purple-bg);
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .demo-input-row button:hover { opacity: 0.88; }
+    .demo-text {
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      line-height: 1.8;
+      margin-bottom: 1rem;
+      min-height: 4em;
+    }
+    .demo-text .typed { color: var(--color-purple); font-weight: 500; }
+    .demo-text .cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1em;
+      background: var(--color-purple);
+      vertical-align: text-bottom;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+    .demo-stats { display: flex; gap: 12px; }
+    .demo-stat {
+      flex: 1;
+      background: var(--color-bg);
+      border-radius: var(--radius-md);
+      padding: 10px;
+      text-align: center;
+      border: 0.5px solid var(--color-border);
+    }
+    .demo-stat .val { font-size: 20px; font-weight: 500; }
+    .demo-stat .lbl { font-size: 11px; color: var(--color-text-secondary); }
+
+    /* ---- Sections ---- */
+    .section { padding: 2.5rem 1.5rem; }
+    .section-title {
+      font-size: 1.4rem;
+      font-weight: 500;
+      margin-bottom: 0.4rem;
+      text-align: center;
+    }
+    .section-sub {
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    /* ---- Problem cards ---- */
+    .problems {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+    }
+    .problem-card {
+      background: var(--color-bg);
+      border: 0.5px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 1rem 1.25rem;
+    }
+    .problem-card .icon {
+      font-size: 22px;
+      color: var(--color-text-secondary);
+      margin-bottom: 8px;
+    }
+    .problem-card h3 { font-size: 14px; font-weight: 500; margin-bottom: 6px; }
+    .problem-card p { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+
+    /* ---- Flow ---- */
+    .flow { display: flex; flex-direction: column; margin-bottom: 1rem; }
+    .flow-step {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      padding: 1rem 0;
+      border-bottom: 0.5px solid var(--color-border);
+    }
+    .flow-step:last-child { border-bottom: none; }
+    .flow-num {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--color-purple-bg);
+      color: var(--color-purple);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+    .flow-content h3 { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+    .flow-content p { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+
+    /* ---- Features ---- */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+    }
+    .feature {
+      background: var(--color-bg-secondary);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+    }
+    .feature .fi { font-size: 22px; color: var(--color-purple); margin-bottom: 8px; }
+    .feature h3 { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+    .feature p { font-size: 12px; color: var(--color-text-secondary); line-height: 1.5; }
+
+    /* ---- Users ---- */
+    .users {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+    .user-card {
+      background: var(--color-bg);
+      border: 0.5px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .user-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .u1 { background: var(--color-purple-bg); color: var(--color-purple); }
+    .u2 { background: var(--color-teal-bg); color: var(--color-teal); }
+    .user-card h3 { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+    .user-card p { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+
+    /* ---- Graph ---- */
+    .graph-section { padding: 0 1.5rem 2rem; }
+    .graph-label { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 0.75rem; text-align: center; }
+    .speed-bars { display: flex; flex-direction: column; gap: 10px; }
+    .speed-row { display: flex; align-items: center; gap: 10px; }
+    .speed-row .wk { font-size: 12px; color: var(--color-text-secondary); width: 42px; flex-shrink: 0; }
+    .speed-bar-wrap {
+      flex: 1;
+      background: var(--color-bg-secondary);
+      border-radius: 4px;
+      height: 22px;
+      overflow: hidden;
+    }
+    .speed-bar {
+      height: 100%;
+      background: var(--color-purple);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      padding-left: 8px;
+    }
+    .speed-bar span { font-size: 11px; color: var(--color-purple-bg); font-weight: 500; }
+
+    /* ---- CTA bottom ---- */
+    .cta-bottom {
+      text-align: center;
+      padding: 3rem 1.5rem 4rem;
+      background: var(--color-bg-secondary);
+      margin-top: 2rem;
+    }
+    .cta-bottom h2 { font-size: 1.4rem; font-weight: 500; margin-bottom: 0.75rem; }
+    .cta-bottom p { font-size: 14px; color: var(--color-text-secondary); margin-bottom: 1.5rem; }
+
+    .divider { height: 0.5px; background: var(--color-border); margin: 0 1.5rem; }
+
+    /* ---- Footer ---- */
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      font-size: 12px;
+      color: var(--color-text-secondary);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Hero Banner -->
+  <section class="hero-banner">
+    <img src="36a11aa1-731b-4ca6-8486-dedebf19f3fe.png" alt="キーワードから、未来につながるタイピング練習 — AIがあなたのキーワードから文章を生成し、効率的に学びタイピング力を伸ばすアプリのイメージ" />
+    <div class="banner-cta">
+      <a class="btn-primary" href="#">無料で始める &rarr;</a>
+      <a class="btn-secondary" href="#demo">デモを見る</a>
+    </div>
+  </section>
+
+  <!-- Demo -->
+  <div class="demo-box" id="demo">
+    <div class="demo-label">プレビュー — こんな感じで練習できます</div>
+    <div class="demo-input-row">
+      <input type="text" id="kw-input" placeholder="キーワードを入力（例：量子コンピュータ）" />
+      <button onclick="generateDemo()">生成</button>
+    </div>
+    <div class="demo-text" id="demo-text">
+      <span class="typed" id="typed-text">量子コンピュータは、量子力学の原理を</span>利用して計算を行う次世代のコンピュータです。従来のビットに代わり量子ビット（qubit）を用いることで、複雑な問題を高速に処理できます。<span class="cursor"></span>
+    </div>
+    <div class="demo-stats">
+      <div class="demo-stat"><div class="val" id="wpm-val">42</div><div class="lbl">文字/分</div></div>
+      <div class="demo-stat"><div class="val" id="acc-val">96%</div><div class="lbl">正確率</div></div>
+      <div class="demo-stat"><div class="val" id="time-val">1:23</div><div class="lbl">経過時間</div></div>
+    </div>
+  </div>
+
+  <!-- Problems -->
+  <section class="section">
+    <div class="section-title">こんな課題を解決します</div>
+    <div class="section-sub">準備の手間を減らし、本番前に自信を持って臨める</div>
+    <div class="problems">
+      <div class="problem-card">
+        <div class="icon"><i class="ti ti-clock" aria-hidden="true"></i></div>
+        <h3>事前準備に時間がかかる</h3>
+        <p>講演者の調査、専門用語の意味調べ、タイピング練習の資料作りで何時間も費やす</p>
+      </div>
+      <div class="problem-card">
+        <div class="icon"><i class="ti ti-keyboard" aria-hidden="true"></i></div>
+        <h3>本番で手が止まる</h3>
+        <p>初めて打つ専門用語で詰まり、リアルタイムの要約筆記が追いつかなくなる</p>
+      </div>
+      <div class="problem-card">
+        <div class="icon"><i class="ti ti-book" aria-hidden="true"></i></div>
+        <h3>単語を覚えにくい</h3>
+        <p>読むだけの学習では定着しない。手を動かしながら意味も覚えたい</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- Flow -->
+  <section class="section">
+    <div class="section-title">使い方は3ステップ</div>
+    <div class="section-sub">アカウント登録後すぐに練習できます</div>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-num">1</div>
+        <div class="flow-content">
+          <h3>キーワードを入力する</h3>
+          <p>講演テーマや学習したい専門用語を入力。複数のキーワードをまとめて入れることもできます。</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">2</div>
+        <div class="flow-content">
+          <h3>AIが練習文を自動生成</h3>
+          <p>キーワードの意味や使い方を含んだ自然な文章をAIが作成。読み上げ音声も同時に生成されます。</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">3</div>
+        <div class="flow-content">
+          <h3>タイピング練習 ＆ 記録を確認</h3>
+          <p>文章を見ながら、または音声を聞きながら入力練習。速度・正確率の伸びをグラフで確認できます。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- Features -->
+  <section class="section">
+    <div class="section-title">主な機能</div>
+    <div class="features">
+      <div class="feature">
+        <div class="fi"><i class="ti ti-sparkles" aria-hidden="true"></i></div>
+        <h3>AI文章生成</h3>
+        <p>キーワードから自動で練習用テキストを作成。毎回異なる文章で飽きずに続けられる</p>
+      </div>
+      <div class="feature">
+        <div class="fi"><i class="ti ti-volume" aria-hidden="true"></i></div>
+        <h3>音声読み上げ</h3>
+        <p>生成文をそのまま読み上げ。聴きながらタイプする本番さながらの練習が可能</p>
+      </div>
+      <div class="feature">
+        <div class="fi"><i class="ti ti-chart-line" aria-hidden="true"></i></div>
+        <h3>成長記録</h3>
+        <p>タイピング速度・正確率を自動記録。週・月ごとの伸びを一目で確認</p>
+      </div>
+      <div class="feature">
+        <div class="fi"><i class="ti ti-user" aria-hidden="true"></i></div>
+        <h3>ログイン機能</h3>
+        <p>アカウントに紐づいた練習履歴。複数デバイスでも記録が引き継がれる</p>
+      </div>
+      <div class="feature">
+        <div class="fi"><i class="ti ti-folder" aria-hidden="true"></i></div>
+        <h3>セット保存</h3>
+        <p>よく使うキーワードセットを保存。次の現場の前にすぐ呼び出して練習再開</p>
+      </div>
+      <div class="feature">
+        <div class="fi"><i class="ti ti-adjustments" aria-hidden="true"></i></div>
+        <h3>難易度調整</h3>
+        <p>文章の長さや語彙の難しさを調整。初心者から上級者まで使える</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- Users -->
+  <section class="section">
+    <div class="section-title">誰のためのアプリ？</div>
+    <div class="users">
+      <div class="user-card">
+        <div class="user-icon u1"><i class="ti ti-writing" aria-hidden="true"></i></div>
+        <div>
+          <h3>要約筆記者・文字通訳者</h3>
+          <p>現場ごとのテーマや専門用語を事前に練習。準備時間を大幅に短縮し、本番のクオリティを上げる</p>
+        </div>
+      </div>
+      <div class="user-card">
+        <div class="user-icon u2"><i class="ti ti-school" aria-hidden="true"></i></div>
+        <div>
+          <h3>学生・学習者</h3>
+          <p>授業や試験のキーワードをタイピングしながら暗記。手を動かすことで記憶に定着しやすい</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Graph -->
+  <div class="graph-section">
+    <div class="section-title" style="margin-bottom:0.5rem;">上達を実感できる</div>
+    <div class="graph-label">1ヶ月間のタイピング速度の推移（例）</div>
+    <div class="speed-bars">
+      <div class="speed-row"><span class="wk">1週目</span><div class="speed-bar-wrap"><div class="speed-bar" style="width:30%"><span>120字/分</span></div></div></div>
+      <div class="speed-row"><span class="wk">2週目</span><div class="speed-bar-wrap"><div class="speed-bar" style="width:48%"><span>190字/分</span></div></div></div>
+      <div class="speed-row"><span class="wk">3週目</span><div class="speed-bar-wrap"><div class="speed-bar" style="width:67%"><span>265字/分</span></div></div></div>
+      <div class="speed-row"><span class="wk">4週目</span><div class="speed-bar-wrap"><div class="speed-bar" style="width:88%"><span>348字/分</span></div></div></div>
+    </div>
+  </div>
+
+  <!-- CTA Bottom -->
+  <div class="cta-bottom">
+    <h2>今すぐ練習を始めよう</h2>
+    <p>アカウント登録は無料。キーワードを入れて、すぐに練習できます。</p>
+    <a class="btn-primary" href="#">無料アカウントを作る &rarr;</a>
+  </div>
+
+  <footer>
+    &copy; 2026 キーワードタイピング練習アプリ
+  </footer>
+
+</div>
+
+<script>
+  const samples = {
+    '量子コンピュータ': '量子コンピュータは、量子力学の原理を利用して計算を行う次世代のコンピュータです。従来のビットに代わり量子ビット（qubit）を用いることで、複雑な問題を高速に処理できます。',
+    '人工知能': '人工知能（AI）は、機械が人間のような知的判断を行う技術の総称です。機械学習や深層学習の発展により、画像認識や自然言語処理など幅広い分野で活用が進んでいます。',
+    'バリアフリー': 'バリアフリーとは、障がいのある人や高齢者が生活しやすいよう、物理的・社会的な障壁を取り除く考え方です。建築物のスロープ設置や点字ブロックの整備などが代表例です。',
+    'default': 'このアプリでは、あなたが入力したキーワードをもとにAIが練習文を自動生成します。専門用語の意味を確認しながらタイピング練習ができるため、要約筆記の準備を効率よく進められます。'
+  };
+
+  function generateDemo() {
+    const kw = document.getElementById('kw-input').value.trim();
+    const text = samples[kw] || samples['default'];
+    const mid = Math.floor(text.length * 0.35);
+    const dt = document.getElementById('demo-text');
+    dt.innerHTML = '';
+    const typed = document.createElement('span');
+    typed.className = 'typed';
+    typed.id = 'typed-text';
+    typed.textContent = text.slice(0, mid);
+    dt.appendChild(typed);
+    dt.appendChild(document.createTextNode(text.slice(mid)));
+    const cur = document.createElement('span');
+    cur.className = 'cursor';
+    dt.appendChild(cur);
+    document.getElementById('wpm-val').textContent = Math.floor(Math.random() * 30 + 35);
+    document.getElementById('acc-val').textContent = (Math.floor(Math.random() * 5 + 94)) + '%';
+  }
+</script>
+
+</body>
+</html>
