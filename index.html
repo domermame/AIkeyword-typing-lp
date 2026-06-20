@@ -101,30 +101,58 @@
     }
     .btn-secondary:hover { background: var(--color-bg-secondary); }
 
-    /* ---- Demo tabs ---- */
-    .demo-tabs {
-      display: flex;
-      gap: 0;
-      margin: 2rem 1.5rem 0;
-      border-bottom: 0.5px solid var(--color-border);
+    /* ---- Demo section header ---- */
+    .demo-section-header {
+      padding: 2.5rem 1.5rem 0;
     }
-    .demo-tab {
+    .demo-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 1.25rem;
+    }
+    .demo-card {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      background: var(--color-bg);
+      border: 0.5px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      text-decoration: none;
+      color: var(--color-text-primary);
+    }
+    .demo-card-active {
+      border-color: var(--color-purple);
+      background: var(--color-purple-bg);
+    }
+    .demo-card-link:hover {
+      border-color: var(--color-teal);
+      background: var(--color-teal-bg);
+    }
+    .demo-card-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--color-bg);
       display: flex;
       align-items: center;
-      gap: 6px;
-      padding: 10px 20px;
-      font-size: 14px;
-      text-decoration: none;
-      color: var(--color-text-secondary);
-      border-bottom: 2px solid transparent;
-      margin-bottom: -0.5px;
-    }
-    .demo-tab:hover { color: var(--color-text-primary); }
-    .demo-tab.active {
+      justify-content: center;
+      font-size: 22px;
       color: var(--color-purple);
-      border-bottom-color: var(--color-purple);
-      font-weight: 500;
+      flex-shrink: 0;
+      border: 0.5px solid var(--color-border);
     }
+    .demo-card-icon.voice { color: var(--color-teal); }
+    .demo-card-badge {
+      font-size: 11px;
+      color: var(--color-purple);
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+    .demo-card-badge.voice { color: var(--color-teal); }
+    .demo-card-body h3 { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+    .demo-card-body p { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
 
     /* ---- Demo box ---- */
     .demo-box {
@@ -375,14 +403,28 @@
     </div>
   </section>
 
-  <!-- Demo tabs -->
-  <div class="demo-tabs">
-    <a class="demo-tab active" href="#demo">
-      <i class="ti ti-keyboard" aria-hidden="true"></i> キーボード入力
-    </a>
-    <a class="demo-tab" href="demo-voice.html">
-      <i class="ti ti-volume" aria-hidden="true"></i> 音声読み上げ
-    </a>
+  <!-- Demo section header -->
+  <div class="demo-section-header">
+    <div class="section-title">2種類のデモを試してみよう</div>
+    <div class="section-sub">練習スタイルに合わせて選べます</div>
+    <div class="demo-cards">
+      <div class="demo-card demo-card-active">
+        <div class="demo-card-icon"><i class="ti ti-keyboard" aria-hidden="true"></i></div>
+        <div class="demo-card-body">
+          <div class="demo-card-badge">このページで体験</div>
+          <h3>キーボード入力デモ</h3>
+          <p>キーワードを入力するとAIが練習文を生成。画面を見ながらタイピング練習できます。</p>
+        </div>
+      </div>
+      <a class="demo-card demo-card-link" href="demo-voice.html">
+        <div class="demo-card-icon voice"><i class="ti ti-volume" aria-hidden="true"></i></div>
+        <div class="demo-card-body">
+          <div class="demo-card-badge voice">別ページで体験 →</div>
+          <h3>音声読み上げデモ</h3>
+          <p>生成した練習文を音声で読み上げ。<strong>聴きながら入力する</strong>本番さながらの練習ができます。</p>
+        </div>
+      </a>
+    </div>
   </div>
 
   <!-- Demo -->
