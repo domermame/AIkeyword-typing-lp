@@ -206,12 +206,7 @@
     .char-pending { color: var(--color-text-secondary); }
     .char-correct { color: #ffffff; background: var(--color-purple); border-radius: 2px; }
     .char-wrong   { color: var(--color-text-secondary); }
-    .char-current {
-      color: var(--color-text-primary);
-      border-bottom: 2px solid var(--color-purple);
-      animation: blink-cursor 1s step-end infinite;
-    }
-    @keyframes blink-cursor { 0%, 100% { border-color: var(--color-purple); } 50% { border-color: transparent; } }
+    .char-current { color: var(--color-text-secondary); }
     .demo-result {
       display: none;
       background: var(--color-purple-bg);
