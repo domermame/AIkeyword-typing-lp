@@ -662,10 +662,14 @@
     document.getElementById('demo-text').innerHTML = '<span class="char-pending">Wikipediaから記事を取得しています…</span>';
 
     try {
-      const { text, title, fallback } = await fetchWikipedia(kw);
-      currentText = text;
-      credit.innerHTML = (fallback ? '「' + kw + '」の記事がないため「' + title + '」を使用しています&ensp;|&ensp;' : '')
-        + '出典: <a href="https://ja.wikipedia.org/wiki/' + encodeURIComponent(title) + '" target="_blank" rel="noopener">Wikipedia「' + title + '」</a>';
+      const result = await fetchWikipedia(kw);
+      currentText = result.text;
+      const note = result.redirected
+        ? '「' + kw + '」→「' + result.title + '」にリダイレクト&ensp;|&ensp;'
+        : result.fallback
+          ? '「' + kw + '」の記事がないため「' + result.title + '」を使用&ensp;|&ensp;'
+          : '';
+      credit.innerHTML = note + '出典: <a href="https://ja.wikipedia.org/wiki/' + encodeURIComponent(result.title) + '" target="_blank" rel="noopener">Wikipedia「' + result.title + '」</a>';
       credit.style.display = 'block';
       startPractice();
     } catch (e) {
@@ -695,7 +699,7 @@
   async function fetchPage(title) {
     const url = 'https://ja.wikipedia.org/w/api.php?action=query'
       + '&titles=' + encodeURIComponent(title)
-      + '&prop=extracts&exintro=true&exsentences=4&format=json&origin=*';
+      + '&prop=extracts&exintro=true&exsentences=4&redirects=1&format=json&origin=*';
 
     const res = await fetch(url);
     if (!res.ok) throw new Error('ネットワークエラーが発生しました。');
@@ -703,6 +707,8 @@
     const data = await res.json();
     const page = Object.values(data.query.pages)[0];
     if (page.missing !== undefined) return null;
+
+    const redirected = page.title !== title;
 
     const div = document.createElement('div');
     div.innerHTML = page.extract;
@@ -723,7 +729,7 @@
 
     if (!text.endsWith('。')) text += '。';
 
-    return { text, title: page.title };
+    return { text, title: page.title, redirected };
   }
 
   async function searchWikipedia(keyword) {
