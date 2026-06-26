@@ -709,6 +709,7 @@
     let text = (div.textContent || '').replace(/\s+/g, ' ').trim();
 
     text = text.replace(/（[^）]{0,20}[：:][^）]*）/g, '');
+    text = text.replace(/([^\x00-\x7F])\s+([^\x00-\x7F])/g, '$1$2');
     text = text.replace(/\s+/g, ' ').trim();
 
     if (text.replace(/[。、\s]/g, '').length < 15) return null;
