@@ -245,6 +245,30 @@
     }
     .demo-stat .val { font-size: 20px; font-weight: 500; }
     .demo-stat .lbl { font-size: 11px; color: var(--color-text-secondary); }
+    .demo-buttons {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+    .demo-btn {
+      flex: 1;
+      padding: 9px 8px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      cursor: pointer;
+      border: 0.5px solid var(--color-border-md);
+      background: transparent;
+      color: var(--color-text-primary);
+      min-width: 80px;
+    }
+    .demo-btn:hover { background: var(--color-bg-secondary); }
+    .demo-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .demo-btn-pause { color: var(--color-text-secondary); }
+    .demo-btn-pause.resuming {
+      border-color: var(--color-purple);
+      color: var(--color-purple);
+    }
 
     /* ---- Sections ---- */
     .section { padding: 2.5rem 1.5rem; }
@@ -445,8 +469,12 @@
     <textarea id="typing-box" placeholder="ここに入力（生成後に入力できます）" rows="3" disabled></textarea>
     <div class="demo-stats">
       <div class="demo-stat"><div class="val" id="wpm-val">—</div><div class="lbl">文字/分</div></div>
-      <div class="demo-stat"><div class="val" id="acc-val">—</div><div class="lbl">正確率</div></div>
       <div class="demo-stat"><div class="val" id="time-val">0:00</div><div class="lbl">経過時間</div></div>
+    </div>
+    <div class="demo-buttons">
+      <button class="demo-btn" id="btn-retry"    onclick="retryDemo()"  disabled>再挑戦</button>
+      <button class="demo-btn" id="btn-new"      onclick="newDemo()"    disabled>新しい問題</button>
+      <button class="demo-btn demo-btn-pause" id="btn-pause" onclick="togglePause()" disabled>一時停止</button>
     </div>
   </div>
 
@@ -602,15 +630,21 @@
   let currentText = '';
   let timerInterval = null;
   let startTime = null;
+  let pausedElapsed = 0;
   let finished = false;
+  let paused = false;
 
   function generateDemo() {
     const kw = document.getElementById('kw-input').value.trim();
     currentText = samples[kw] || samples['default'];
+    startPractice();
+  }
 
+  function startPractice() {
     renderChars('');
     resetTimer();
     finished = false;
+    paused = false;
 
     const box = document.getElementById('typing-box');
     box.value = '';
@@ -620,7 +654,8 @@
 
     document.getElementById('demo-result').style.display = 'none';
     document.getElementById('wpm-val').textContent = '—';
-    document.getElementById('acc-val').textContent = '—';
+    setButtonState(true);
+    resetPauseBtn();
   }
 
   function renderChars(typed) {
@@ -641,7 +676,7 @@
   }
 
   function onTyping() {
-    if (finished) return;
+    if (finished || paused) return;
     const typed = document.getElementById('typing-box').value;
 
     if (typed.length === 1 && !startTime) {
@@ -650,18 +685,13 @@
 
     renderChars(typed);
 
-    const correct = [...typed].filter((c, i) => c === currentText[i]).length;
-    if (typed.length > 0) {
-      document.getElementById('acc-val').textContent = Math.round(correct / typed.length * 100) + '%';
-    }
-
     if (typed === currentText) {
       stopTimer(typed.length);
     }
   }
 
   function startTimer() {
-    startTime = Date.now();
+    startTime = Date.now() - pausedElapsed * 1000;
     timerInterval = setInterval(() => {
       const elapsed = Math.floor((Date.now() - startTime) / 1000);
       document.getElementById('time-val').textContent = fmt(elapsed);
@@ -688,13 +718,71 @@
     result.style.display = 'block';
 
     document.getElementById('typing-box').disabled = true;
+    document.getElementById('btn-pause').disabled = true;
   }
 
   function resetTimer() {
     clearInterval(timerInterval);
     timerInterval = null;
     startTime = null;
+    pausedElapsed = 0;
     document.getElementById('time-val').textContent = '0:00';
+  }
+
+  /* ---- ボタン操作 ---- */
+  function retryDemo() {
+    if (!currentText) return;
+    startPractice();
+  }
+
+  function newDemo() {
+    resetTimer();
+    finished = false;
+    paused = false;
+    currentText = '';
+    document.getElementById('demo-text').innerHTML = '<span class="char-pending">キーワードを入力して「生成」を押してください。</span>';
+    document.getElementById('typing-box').value = '';
+    document.getElementById('typing-box').disabled = true;
+    document.getElementById('typing-box').placeholder = 'ここに入力（生成後に入力できます）';
+    document.getElementById('demo-result').style.display = 'none';
+    document.getElementById('wpm-val').textContent = '—';
+    document.getElementById('kw-input').value = '';
+    document.getElementById('kw-input').focus();
+    setButtonState(false);
+  }
+
+  function togglePause() {
+    if (finished) return;
+    if (!paused) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      pausedElapsed = Math.floor((Date.now() - startTime) / 1000);
+      paused = true;
+      document.getElementById('typing-box').disabled = true;
+      const btn = document.getElementById('btn-pause');
+      btn.textContent = '再開';
+      btn.classList.add('resuming');
+    } else {
+      paused = false;
+      document.getElementById('typing-box').disabled = false;
+      document.getElementById('typing-box').focus();
+      startTimer();
+      const btn = document.getElementById('btn-pause');
+      btn.textContent = '一時停止';
+      btn.classList.remove('resuming');
+    }
+  }
+
+  function setButtonState(active) {
+    document.getElementById('btn-retry').disabled = !active;
+    document.getElementById('btn-new').disabled = !active;
+    document.getElementById('btn-pause').disabled = !active;
+  }
+
+  function resetPauseBtn() {
+    const btn = document.getElementById('btn-pause');
+    btn.textContent = '一時停止';
+    btn.classList.remove('resuming');
   }
 
   function fmt(sec) {
