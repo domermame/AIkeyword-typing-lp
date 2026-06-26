@@ -666,9 +666,7 @@
       currentText = result.text;
       const note = result.redirected
         ? '「' + kw + '」→「' + result.title + '」にリダイレクト&ensp;|&ensp;'
-        : result.fallback
-          ? '「' + kw + '」の記事がないため「' + result.title + '」を使用&ensp;|&ensp;'
-          : '';
+        : '';
       credit.innerHTML = note + '出典: <a href="https://ja.wikipedia.org/wiki/' + encodeURIComponent(result.title) + '" target="_blank" rel="noopener">Wikipedia「' + result.title + '」</a>';
       credit.style.display = 'block';
       startPractice();
@@ -683,16 +681,8 @@
   }
 
   async function fetchWikipedia(keyword) {
-    let result = await fetchPage(keyword);
-
-    if (!result) {
-      const altTitle = await searchWikipedia(keyword);
-      if (!altTitle) throw new Error('「' + keyword + '」の記事がWikipediaに見つかりませんでした。別のキーワードを試してください。');
-      result = await fetchPage(altTitle);
-      if (!result) throw new Error('「' + keyword + '」の記事がWikipediaに見つかりませんでした。別のキーワードを試してください。');
-      result.fallback = true;
-    }
-
+    const result = await fetchPage(keyword);
+    if (!result) throw new Error('「' + keyword + '」の文章が取得できませんでした。別のキーワードを試してください。');
     return result;
   }
 
@@ -732,14 +722,6 @@
     return { text, title: page.title, redirected };
   }
 
-  async function searchWikipedia(keyword) {
-    const url = 'https://ja.wikipedia.org/w/api.php?action=opensearch'
-      + '&search=' + encodeURIComponent(keyword)
-      + '&limit=1&format=json&origin=*';
-    const res = await fetch(url);
-    const data = await res.json();
-    return (data[1] && data[1].length > 0) ? data[1][0] : null;
-  }
 
   function startPractice() {
     renderChars('');
