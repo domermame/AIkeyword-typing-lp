@@ -660,7 +660,7 @@
       document.getElementById('acc-val').textContent = Math.round(correct / typed.length * 100) + '%';
     }
 
-    if (typed.length >= currentText.length) {
+    if (typed === currentText) {
       stopTimer(typed.length);
     }
   }
