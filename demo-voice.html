@@ -420,7 +420,7 @@
     <button class="btn-retry" id="btn-retry" onclick="retryTyping()" disabled>
       <i class="ti ti-refresh" aria-hidden="true"></i> 再挑戦
     </button>
-    <button class="btn-new" id="btn-new" onclick="generateText()" disabled>
+    <button class="btn-new" id="btn-new" onclick="newQuestion()" disabled>
       <i class="ti ti-plus" aria-hidden="true"></i> 新しい問題
     </button>
     <span class="hint-enter">Enter で終了</span>
@@ -615,6 +615,23 @@
     resetStats();
     document.getElementById('typing-box').value = '';
     document.getElementById('typing-box').focus();
+  }
+
+  /* ---- 新しい問題 ---- */
+  function newQuestion() {
+    stopSpeech();
+    resetStats();
+    currentText = '';
+    document.getElementById('typing-box').value = '';
+    document.getElementById('text-box').textContent = 'キーワードを入力して「生成」を押すと、練習文がここに表示されます。';
+    document.getElementById('wiki-credit').style.display = 'none';
+    document.getElementById('demo-error').style.display = 'none';
+    document.getElementById('btn-play').disabled = true;
+    document.getElementById('btn-retry').disabled = true;
+    document.getElementById('btn-new').disabled = true;
+    document.getElementById('btn-finish').disabled = true;
+    document.getElementById('kw-input').value = '';
+    document.getElementById('kw-input').focus();
   }
 
   /* ---- 入力終了 ---- */
