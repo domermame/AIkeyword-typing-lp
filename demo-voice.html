@@ -171,6 +171,22 @@
       min-height: 6rem;
       color: var(--color-text-secondary);
     }
+    /* 読み上げ済み: 薄い色 */
+    .text-box .spoken {
+      color: var(--color-text-secondary);
+      opacity: 0.5;
+    }
+    /* 現在読み上げ中: ティール背景ハイライト */
+    .text-box .speaking {
+      background: var(--color-teal);
+      color: #ffffff;
+      border-radius: 3px;
+      padding: 1px 2px;
+    }
+    /* まだ読んでいない: 通常色 */
+    .text-box .unspoken {
+      color: var(--color-text-primary);
+    }
 
     /* ---- Voice controls ---- */
     .voice-controls {
@@ -268,9 +284,37 @@
       line-height: 1.7;
       resize: none;
       outline: none;
-      margin-bottom: 1rem;
+      margin-bottom: 0.75rem;
     }
     #typing-box:focus { border-color: var(--color-purple); }
+
+    /* ---- Finish button ---- */
+    .finish-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 1rem;
+    }
+    .btn-finish {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 18px;
+      background: var(--color-purple);
+      color: var(--color-purple-bg);
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .btn-finish:hover { opacity: 0.88; }
+    .btn-finish:disabled { opacity: 0.4; cursor: not-allowed; }
+    .hint-enter {
+      font-size: 11px;
+      color: var(--color-text-secondary);
+      margin-right: 8px;
+      align-self: center;
+    }
 
     /* ---- Stats ---- */
     .stats { display: flex; gap: 12px; margin-bottom: 2rem; }
@@ -284,6 +328,8 @@
     }
     .stat .val { font-size: 22px; font-weight: 500; }
     .stat .lbl { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+    .stat.finished { border-color: var(--color-purple); background: var(--color-purple-bg); }
+    .stat.finished .val { color: var(--color-purple); }
 
     /* ---- Tip box ---- */
     .tip {
@@ -344,9 +390,9 @@
     <span class="speed-label"><i class="ti ti-gauge" aria-hidden="true"></i> 読み上げ速度</span>
     <div class="speed-btns">
       <button class="speed-btn" data-rate="0.5" onclick="setSpeed(this)">遅い</button>
-      <button class="speed-btn active" data-rate="0.8" onclick="setSpeed(this)">ふつう</button>
-      <button class="speed-btn" data-rate="1.0" onclick="setSpeed(this)">やや速い</button>
-      <button class="speed-btn" data-rate="1.3" onclick="setSpeed(this)">速い</button>
+      <button class="speed-btn active" data-rate="0.7" onclick="setSpeed(this)">やや遅い</button>
+      <button class="speed-btn" data-rate="0.9" onclick="setSpeed(this)">ふつう</button>
+      <button class="speed-btn" data-rate="1.1" onclick="setSpeed(this)">やや速い</button>
     </div>
   </div>
 
@@ -356,11 +402,19 @@
   <div class="step-label"><span class="step-num">3</span> 聴きながら入力練習</div>
   <textarea id="typing-box" rows="4" placeholder="ここに入力" oninput="updateStats()"></textarea>
 
+  <!-- Finish button -->
+  <div class="finish-row">
+    <span class="hint-enter">Enter で終了</span>
+    <button class="btn-finish" id="btn-finish" onclick="finishTyping()" disabled>
+      <i class="ti ti-check" aria-hidden="true"></i> 入力終了
+    </button>
+  </div>
+
   <!-- Stats -->
   <div class="stats">
-    <div class="stat"><div class="val" id="stat-chars">0</div><div class="lbl">入力文字数</div></div>
-    <div class="stat"><div class="val" id="stat-wpm">—</div><div class="lbl">文字/分</div></div>
-    <div class="stat"><div class="val" id="stat-time">0:00</div><div class="lbl">経過時間</div></div>
+    <div class="stat" id="s-chars"><div class="val" id="stat-chars">0</div><div class="lbl">入力文字数</div></div>
+    <div class="stat" id="s-wpm"><div class="val" id="stat-wpm">—</div><div class="lbl">文字/分</div></div>
+    <div class="stat" id="s-time"><div class="val" id="stat-time">0:00</div><div class="lbl">経過時間</div></div>
   </div>
 
   <!-- Tip -->
@@ -373,9 +427,10 @@
 
 <script>
   let currentText = '';
-  let currentRate = 0.8;
+  let currentRate = 0.7;
   let startTime = null;
   let timerInterval = null;
+  let finished = false;
 
   /* ---- Wikipedia API ---- */
   async function generateText() {
@@ -386,7 +441,7 @@
     const errBox = document.getElementById('demo-error');
     const credit = document.getElementById('wiki-credit');
 
-    btn.textContent = '取得中…';
+    btn.innerHTML = '取得中…';
     btn.disabled = true;
     errBox.style.display = 'none';
     credit.style.display = 'none';
@@ -402,10 +457,13 @@
       const note = result.redirected
         ? '「' + kw + '」→「' + result.title + '」にリダイレクト&ensp;|&ensp;'
         : '';
-      credit.innerHTML = note + '出典: <a href="https://ja.wikipedia.org/wiki/' + encodeURIComponent(result.title) + '" target="_blank" rel="noopener">Wikipedia「' + result.title + '」</a>';
+      credit.innerHTML = note + '出典: <a href="https://ja.wikipedia.org/wiki/'
+        + encodeURIComponent(result.title) + '" target="_blank" rel="noopener">Wikipedia「'
+        + result.title + '」</a>';
       credit.style.display = 'block';
 
       document.getElementById('btn-play').disabled = false;
+      document.getElementById('btn-finish').disabled = false;
       document.getElementById('typing-box').value = '';
     } catch (e) {
       errBox.textContent = e.message;
@@ -459,6 +517,27 @@
     return { text, title: page.title, redirected };
   }
 
+  /* ---- テキストのエスケープ ---- */
+  function esc(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  /* ---- 読み上げ進捗の色付け ---- */
+  function renderProgress(charIndex, charLen) {
+    const t = currentText;
+    const end = Math.min(charIndex + (charLen || 1), t.length);
+    document.getElementById('text-box').innerHTML =
+      '<span class="spoken">'  + esc(t.slice(0, charIndex)) + '</span>' +
+      '<span class="speaking">' + esc(t.slice(charIndex, end)) + '</span>' +
+      '<span class="unspoken">' + esc(t.slice(end)) + '</span>';
+  }
+
+  function resetTextDisplay() {
+    if (currentText) {
+      document.getElementById('text-box').textContent = currentText;
+    }
+  }
+
   /* ---- 速度ボタン ---- */
   function setSpeed(btn) {
     currentRate = parseFloat(btn.dataset.rate);
@@ -477,9 +556,15 @@
     const utterance = new SpeechSynthesisUtterance(currentText);
     utterance.lang = 'ja-JP';
     utterance.rate = currentRate;
+
+    utterance.onboundary = (e) => {
+      if (e.name === 'word' || e.name === 'sentence') {
+        renderProgress(e.charIndex, e.charLength);
+      }
+    };
     utterance.onstart = () => setStatus(true);
-    utterance.onend   = () => setStatus(false);
-    utterance.onerror = () => setStatus(false);
+    utterance.onend   = () => { setStatus(false); resetTextDisplay(); };
+    utterance.onerror = () => { setStatus(false); resetTextDisplay(); };
 
     window.speechSynthesis.speak(utterance);
   }
@@ -487,6 +572,7 @@
   function stopSpeech() {
     window.speechSynthesis.cancel();
     setStatus(false);
+    resetTextDisplay();
   }
 
   function setStatus(playing) {
@@ -503,10 +589,35 @@
     }
   }
 
+  /* ---- 入力終了 ---- */
+  function finishTyping() {
+    if (finished || !startTime) return;
+    finished = true;
+    clearInterval(timerInterval);
+
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    const typed = document.getElementById('typing-box').value;
+    const chars = typed.length;
+    const wpm = elapsed > 0 ? Math.round(chars / (elapsed / 60)) : 0;
+
+    document.getElementById('stat-chars').textContent = chars;
+    document.getElementById('stat-wpm').textContent = wpm;
+    document.getElementById('stat-time').textContent = fmt(elapsed);
+
+    ['s-chars', 's-wpm', 's-time'].forEach(id => {
+      document.getElementById(id).classList.add('finished');
+    });
+
+    document.getElementById('btn-finish').disabled = true;
+    document.getElementById('btn-finish').innerHTML = '<i class="ti ti-check"></i> 終了しました';
+  }
+
   /* ---- タイマー・統計 ---- */
   function startTimer() {
+    finished = false;
     startTime = Date.now();
     timerInterval = setInterval(() => {
+      if (finished) return;
       const elapsed = Math.floor((Date.now() - startTime) / 1000);
       document.getElementById('stat-time').textContent = fmt(elapsed);
       const len = document.getElementById('typing-box').value.length;
@@ -519,12 +630,20 @@
   function resetStats() {
     clearInterval(timerInterval);
     startTime = null;
+    finished = false;
     document.getElementById('stat-chars').textContent = '0';
     document.getElementById('stat-wpm').textContent = '—';
     document.getElementById('stat-time').textContent = '0:00';
+    ['s-chars', 's-wpm', 's-time'].forEach(id => {
+      document.getElementById(id).classList.remove('finished');
+    });
+    const finBtn = document.getElementById('btn-finish');
+    finBtn.disabled = true;
+    finBtn.innerHTML = '<i class="ti ti-check"></i> 入力終了';
   }
 
   function updateStats() {
+    if (finished) return;
     if (!startTime) startTimer();
     const typed = document.getElementById('typing-box').value;
     document.getElementById('stat-chars').textContent = typed.length;
@@ -533,6 +652,14 @@
   function fmt(sec) {
     return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
   }
+
+  /* ---- Enter キーで入力終了 ---- */
+  document.getElementById('typing-box').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      finishTyping();
+    }
+  });
 </script>
 
 </body>
