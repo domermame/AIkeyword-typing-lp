@@ -110,7 +110,7 @@
     .input-row {
       display: flex;
       gap: 8px;
-      margin-bottom: 1.5rem;
+      margin-bottom: 0.5rem;
     }
     .input-row input {
       flex: 1;
@@ -137,6 +137,27 @@
       gap: 6px;
     }
     .btn-generate:hover { opacity: 0.88; }
+    .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ---- Error / Credit ---- */
+    .demo-error {
+      display: none;
+      background: var(--color-bg-secondary);
+      border: 0.5px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 8px 12px;
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      margin-bottom: 1rem;
+    }
+    .wiki-credit {
+      display: none;
+      font-size: 11px;
+      color: var(--color-text-secondary);
+      text-align: right;
+      margin-bottom: 0.75rem;
+    }
+    .wiki-credit a { color: var(--color-text-secondary); }
 
     /* ---- Generated text box ---- */
     .text-box {
@@ -148,16 +169,15 @@
       line-height: 1.9;
       margin-bottom: 1rem;
       min-height: 6rem;
-      position: relative;
+      color: var(--color-text-secondary);
     }
-    .text-box .highlight { background: #fef08a; border-radius: 2px; color: #1a1a18; }
 
     /* ---- Voice controls ---- */
     .voice-controls {
       display: flex;
       gap: 10px;
       align-items: center;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
       flex-wrap: wrap;
     }
     .btn-play {
@@ -188,24 +208,6 @@
       cursor: pointer;
     }
     .btn-stop:hover { background: var(--color-bg-secondary); }
-    .speed-control {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-left: auto;
-      font-size: 13px;
-      color: var(--color-text-secondary);
-    }
-    .speed-control select {
-      padding: 6px 10px;
-      border-radius: var(--radius-md);
-      border: 0.5px solid var(--color-border-md);
-      background: var(--color-bg);
-      color: var(--color-text-primary);
-      font-size: 13px;
-      outline: none;
-      cursor: pointer;
-    }
     .status-badge {
       font-size: 12px;
       padding: 4px 10px;
@@ -218,6 +220,39 @@
       background: var(--color-teal-bg);
       color: var(--color-teal);
       border-color: transparent;
+    }
+
+    /* ---- Speed buttons ---- */
+    .speed-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 1.5rem;
+    }
+    .speed-label {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      flex-shrink: 0;
+    }
+    .speed-btns {
+      display: flex;
+      gap: 6px;
+    }
+    .speed-btn {
+      padding: 6px 14px;
+      border-radius: var(--radius-md);
+      border: 0.5px solid var(--color-border-md);
+      background: transparent;
+      color: var(--color-text-secondary);
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .speed-btn:hover { background: var(--color-bg-secondary); }
+    .speed-btn.active {
+      background: var(--color-teal-bg);
+      color: var(--color-teal);
+      border-color: transparent;
+      font-weight: 500;
     }
 
     /* ---- Typing area ---- */
@@ -279,16 +314,18 @@
   <!-- Step 1: キーワード入力 -->
   <div class="step-label"><span class="step-num">1</span> キーワードを入力して練習文を生成</div>
   <div class="input-row">
-    <input type="text" id="kw-input" placeholder="例：バリアフリー、人工知能、要約筆記 …" />
-    <button class="btn-generate" onclick="generateText()">
+    <input type="text" id="kw-input" placeholder="例：要約筆記、バリアフリー、人工知能…" onkeydown="if(event.key==='Enter')generateText()" />
+    <button class="btn-generate" id="btn-generate" onclick="generateText()">
       <i class="ti ti-sparkles" aria-hidden="true"></i> 生成
     </button>
   </div>
+  <div class="demo-error" id="demo-error"></div>
+  <div class="wiki-credit" id="wiki-credit"></div>
 
   <!-- Generated text -->
   <div class="step-label"><span class="step-num">2</span> 生成された練習文を音声で聴く</div>
   <div class="text-box" id="text-box">
-    キーワードを入力して「生成」を押すと、練習文がここに表示されます。音声ボタンで読み上げを開始してください。
+    キーワードを入力して「生成」を押すと、練習文がここに表示されます。
   </div>
 
   <!-- Voice controls -->
@@ -296,19 +333,20 @@
     <button class="btn-play" id="btn-play" onclick="startSpeech()" disabled>
       <i class="ti ti-player-play" aria-hidden="true"></i> 読み上げ開始
     </button>
-    <button class="btn-stop" id="btn-stop" onclick="stopSpeech()">
+    <button class="btn-stop" onclick="stopSpeech()">
       <i class="ti ti-player-stop" aria-hidden="true"></i> 停止
     </button>
     <span class="status-badge" id="status-badge">待機中</span>
-    <div class="speed-control">
-      <i class="ti ti-gauge" aria-hidden="true"></i>
-      <span>速度</span>
-      <select id="speed-select" onchange="updateSpeed()">
-        <option value="0.6">遅い</option>
-        <option value="0.8" selected>普通</option>
-        <option value="1.0">やや速い</option>
-        <option value="1.2">速い</option>
-      </select>
+  </div>
+
+  <!-- Speed buttons -->
+  <div class="speed-row">
+    <span class="speed-label"><i class="ti ti-gauge" aria-hidden="true"></i> 読み上げ速度</span>
+    <div class="speed-btns">
+      <button class="speed-btn" data-rate="0.5" onclick="setSpeed(this)">遅い</button>
+      <button class="speed-btn active" data-rate="0.8" onclick="setSpeed(this)">ふつう</button>
+      <button class="speed-btn" data-rate="1.0" onclick="setSpeed(this)">やや速い</button>
+      <button class="speed-btn" data-rate="1.3" onclick="setSpeed(this)">速い</button>
     </div>
   </div>
 
@@ -322,56 +360,125 @@
   <div class="stats">
     <div class="stat"><div class="val" id="stat-chars">0</div><div class="lbl">入力文字数</div></div>
     <div class="stat"><div class="val" id="stat-wpm">—</div><div class="lbl">文字/分</div></div>
-    <div class="stat"><div class="val" id="stat-acc">—</div><div class="lbl">正確率</div></div>
     <div class="stat"><div class="val" id="stat-time">0:00</div><div class="lbl">経過時間</div></div>
   </div>
 
   <!-- Tip -->
   <div class="tip">
     <i class="ti ti-info-circle" aria-hidden="true"></i>
-    <span>音声読み上げにはブラウザ内蔵の音声合成を使用しています。「遅い」設定で読み上げながら入力すると、要約筆記の本番練習に近い環境が作れます。</span>
+    <span>音声読み上げにはブラウザ内蔵の音声合成を使用しています。「遅い」設定で聴きながら入力すると、要約筆記の本番練習に近い環境が作れます。速度は読み上げ前に選んでください。</span>
   </div>
 
 </div>
 
 <script>
-  const samples = {
-    'バリアフリー': 'バリアフリーとは、障がいのある人や高齢者が生活しやすいよう、物理的・社会的な障壁を取り除く考え方です。建築物のスロープ設置や点字ブロックの整備、また手話通訳や要約筆記の提供なども、バリアフリーの重要な取り組みです。',
-    '人工知能': '人工知能（AI）は、機械が人間のような知的判断を行う技術の総称です。機械学習や深層学習の発展により、画像認識や自然言語処理など幅広い分野で活用が進んでいます。今後の社会では、AIと共に学び、考える力がますます重要になるでしょう。',
-    '要約筆記': '要約筆記とは、話し言葉を聴覚障がい者にリアルタイムで伝えるために、内容を要約しながら文字に書き起こす情報保障の手段です。講演や会議の場で活躍する要約筆記者は、素早いタイピングと内容理解の両方が求められます。',
-    '量子コンピュータ': '量子コンピュータは、量子力学の原理を利用して計算を行う次世代のコンピュータです。従来のビットに代わり量子ビット（qubit）を用いることで、複雑な問題を高速に処理できます。医療や暗号技術など、さまざまな分野への応用が期待されています。',
-    'default': 'このアプリでは、あなたが入力したキーワードをもとにAIが練習文を自動生成し、音声で読み上げます。聴きながらタイピングすることで、要約筆記の現場に近い練習環境をどこでも手軽に作ることができます。'
-  };
-
   let currentText = '';
-  let utterance = null;
+  let currentRate = 0.8;
   let startTime = null;
   let timerInterval = null;
 
-  function generateText() {
+  /* ---- Wikipedia API ---- */
+  async function generateText() {
     const kw = document.getElementById('kw-input').value.trim();
-    currentText = samples[kw] || samples['default'];
-    document.getElementById('text-box').textContent = currentText;
-    document.getElementById('btn-play').disabled = false;
-    document.getElementById('typing-box').value = '';
-    resetStats();
+    if (!kw) return;
+
+    const btn = document.getElementById('btn-generate');
+    const errBox = document.getElementById('demo-error');
+    const credit = document.getElementById('wiki-credit');
+
+    btn.textContent = '取得中…';
+    btn.disabled = true;
+    errBox.style.display = 'none';
+    credit.style.display = 'none';
+    document.getElementById('text-box').textContent = 'Wikipediaから記事を取得しています…';
     stopSpeech();
+    resetStats();
+
+    try {
+      const result = await fetchWikipedia(kw);
+      currentText = result.text;
+      document.getElementById('text-box').textContent = currentText;
+
+      const note = result.redirected
+        ? '「' + kw + '」→「' + result.title + '」にリダイレクト&ensp;|&ensp;'
+        : '';
+      credit.innerHTML = note + '出典: <a href="https://ja.wikipedia.org/wiki/' + encodeURIComponent(result.title) + '" target="_blank" rel="noopener">Wikipedia「' + result.title + '」</a>';
+      credit.style.display = 'block';
+
+      document.getElementById('btn-play').disabled = false;
+      document.getElementById('typing-box').value = '';
+    } catch (e) {
+      errBox.textContent = e.message;
+      errBox.style.display = 'block';
+      document.getElementById('text-box').textContent = 'キーワードを入力して「生成」を押してください。';
+    } finally {
+      btn.innerHTML = '<i class="ti ti-sparkles"></i> 生成';
+      btn.disabled = false;
+    }
   }
 
+  async function fetchWikipedia(keyword) {
+    const result = await fetchPage(keyword);
+    if (!result) throw new Error('「' + keyword + '」の文章が取得できませんでした。別のキーワードを試してください。');
+    return result;
+  }
+
+  async function fetchPage(title) {
+    const url = 'https://ja.wikipedia.org/w/api.php?action=query'
+      + '&titles=' + encodeURIComponent(title)
+      + '&prop=extracts&exintro=true&exsentences=4&redirects=1&format=json&origin=*';
+
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('ネットワークエラーが発生しました。');
+
+    const data = await res.json();
+    const page = Object.values(data.query.pages)[0];
+    if (page.missing !== undefined) return null;
+
+    const redirected = page.title !== title;
+
+    const div = document.createElement('div');
+    div.innerHTML = page.extract;
+    let text = (div.textContent || '').replace(/\s+/g, ' ').trim();
+
+    text = text.replace(/（[^）]{0,20}[：:][^）]*）/g, '');
+    text = text.replace(/\(/g, '（').replace(/\)/g, '）');
+    text = text.replace(/!/g, '！').replace(/\?/g, '？');
+    text = text.replace(/([^\x00-\x7F])\s+([^\x00-\x7F])/g, '$1$2');
+    text = text.replace(/\s+/g, ' ').trim();
+
+    if (text.replace(/[。、\s]/g, '').length < 15) return null;
+
+    if (text.length > 250) {
+      const cut = text.indexOf('。', 100);
+      text = cut !== -1 && cut < 280 ? text.slice(0, cut + 1) : text.slice(0, 200) + '。';
+    }
+
+    if (!text.endsWith('。')) text += '。';
+
+    return { text, title: page.title, redirected };
+  }
+
+  /* ---- 速度ボタン ---- */
+  function setSpeed(btn) {
+    currentRate = parseFloat(btn.dataset.rate);
+    document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if (window.speechSynthesis.speaking) {
+      startSpeech();
+    }
+  }
+
+  /* ---- 音声読み上げ ---- */
   function startSpeech() {
     if (!currentText) return;
     stopSpeech();
 
-    const speed = parseFloat(document.getElementById('speed-select').value);
-    utterance = new SpeechSynthesisUtterance(currentText);
+    const utterance = new SpeechSynthesisUtterance(currentText);
     utterance.lang = 'ja-JP';
-    utterance.rate = speed;
-
-    utterance.onstart = () => {
-      setStatus(true);
-      if (!startTime) startTimer();
-    };
-    utterance.onend = () => setStatus(false);
+    utterance.rate = currentRate;
+    utterance.onstart = () => setStatus(true);
+    utterance.onend   = () => setStatus(false);
     utterance.onerror = () => setStatus(false);
 
     window.speechSynthesis.speak(utterance);
@@ -382,15 +489,9 @@
     setStatus(false);
   }
 
-  function updateSpeed() {
-    if (window.speechSynthesis.speaking) {
-      startSpeech();
-    }
-  }
-
   function setStatus(playing) {
     const badge = document.getElementById('status-badge');
-    const btn = document.getElementById('btn-play');
+    const btn   = document.getElementById('btn-play');
     if (playing) {
       badge.textContent = '読み上げ中';
       badge.classList.add('playing');
@@ -402,14 +503,16 @@
     }
   }
 
+  /* ---- タイマー・統計 ---- */
   function startTimer() {
     startTime = Date.now();
     timerInterval = setInterval(() => {
       const elapsed = Math.floor((Date.now() - startTime) / 1000);
-      const m = Math.floor(elapsed / 60);
-      const s = elapsed % 60;
-      document.getElementById('stat-time').textContent = m + ':' + String(s).padStart(2, '0');
-      updateWpm(elapsed);
+      document.getElementById('stat-time').textContent = fmt(elapsed);
+      const len = document.getElementById('typing-box').value.length;
+      if (len > 0 && elapsed > 0) {
+        document.getElementById('stat-wpm').textContent = Math.round(len / (elapsed / 60));
+      }
     }, 1000);
   }
 
@@ -418,30 +521,17 @@
     startTime = null;
     document.getElementById('stat-chars').textContent = '0';
     document.getElementById('stat-wpm').textContent = '—';
-    document.getElementById('stat-acc').textContent = '—';
     document.getElementById('stat-time').textContent = '0:00';
   }
 
   function updateStats() {
     if (!startTime) startTimer();
     const typed = document.getElementById('typing-box').value;
-    const chars = typed.length;
-    document.getElementById('stat-chars').textContent = chars;
-
-    let correct = 0;
-    for (let i = 0; i < Math.min(typed.length, currentText.length); i++) {
-      if (typed[i] === currentText[i]) correct++;
-    }
-    if (chars > 0) {
-      document.getElementById('stat-acc').textContent = Math.round(correct / chars * 100) + '%';
-    }
+    document.getElementById('stat-chars').textContent = typed.length;
   }
 
-  function updateWpm(elapsed) {
-    if (elapsed < 5) return;
-    const typed = document.getElementById('typing-box').value.length;
-    const wpm = Math.round(typed / (elapsed / 60));
-    if (typed > 0) document.getElementById('stat-wpm').textContent = wpm;
+  function fmt(sec) {
+    return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
   }
 </script>
 
