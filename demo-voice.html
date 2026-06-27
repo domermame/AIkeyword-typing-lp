@@ -171,22 +171,9 @@
       min-height: 6rem;
       color: var(--color-text-secondary);
     }
-    /* 読み上げ済み: 薄い色 */
-    .text-box .spoken {
-      color: var(--color-text-secondary);
-      opacity: 0.5;
-    }
-    /* 現在読み上げ中: ティール背景ハイライト */
-    .text-box .speaking {
-      background: var(--color-teal);
-      color: #ffffff;
-      border-radius: 3px;
-      padding: 1px 2px;
-    }
-    /* まだ読んでいない: 通常色 */
-    .text-box .unspoken {
-      color: var(--color-text-primary);
-    }
+    .text-box .spoken   { color: var(--color-text-secondary); opacity: 0.5; }
+    .text-box .speaking { background: var(--color-teal); color: #ffffff; border-radius: 3px; padding: 1px 2px; }
+    .text-box .unspoken { color: var(--color-text-primary); }
 
     /* ---- Voice controls ---- */
     .voice-controls {
@@ -250,10 +237,7 @@
       color: var(--color-text-secondary);
       flex-shrink: 0;
     }
-    .speed-btns {
-      display: flex;
-      gap: 6px;
-    }
+    .speed-btns { display: flex; gap: 6px; }
     .speed-btn {
       padding: 6px 14px;
       border-radius: var(--radius-md);
@@ -288,12 +272,42 @@
     }
     #typing-box:focus { border-color: var(--color-purple); }
 
-    /* ---- Finish button ---- */
-    .finish-row {
+    /* ---- Action buttons row (再挑戦 / 新しい問題 / 入力終了) ---- */
+    .action-row {
       display: flex;
-      justify-content: flex-end;
+      gap: 8px;
+      align-items: center;
       margin-bottom: 1rem;
+      flex-wrap: wrap;
     }
+    .btn-retry {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 16px;
+      background: transparent;
+      color: var(--color-text-secondary);
+      border: 0.5px solid var(--color-border-md);
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .btn-retry:hover { background: var(--color-bg-secondary); }
+    .btn-retry:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-new {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 16px;
+      background: transparent;
+      color: var(--color-text-secondary);
+      border: 0.5px solid var(--color-border-md);
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .btn-new:hover { background: var(--color-bg-secondary); }
+    .btn-new:disabled { opacity: 0.4; cursor: not-allowed; }
     .btn-finish {
       display: flex;
       align-items: center;
@@ -306,28 +320,27 @@
       font-size: 14px;
       cursor: pointer;
       font-weight: 500;
+      margin-left: auto;
     }
     .btn-finish:hover { opacity: 0.88; }
     .btn-finish:disabled { opacity: 0.4; cursor: not-allowed; }
     .hint-enter {
       font-size: 11px;
       color: var(--color-text-secondary);
-      margin-right: 8px;
-      align-self: center;
     }
 
     /* ---- Stats ---- */
-    .stats { display: flex; gap: 12px; margin-bottom: 2rem; }
+    .stats { display: flex; gap: 10px; margin-bottom: 2rem; }
     .stat {
       flex: 1;
       background: var(--color-bg-secondary);
       border-radius: var(--radius-md);
-      padding: 12px;
+      padding: 10px 8px;
       text-align: center;
       border: 0.5px solid var(--color-border);
     }
-    .stat .val { font-size: 22px; font-weight: 500; }
-    .stat .lbl { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+    .stat .val { font-size: 20px; font-weight: 500; }
+    .stat .lbl { font-size: 10px; color: var(--color-text-secondary); margin-top: 2px; }
     .stat.finished { border-color: var(--color-purple); background: var(--color-purple-bg); }
     .stat.finished .val { color: var(--color-purple); }
 
@@ -402,8 +415,14 @@
   <div class="step-label"><span class="step-num">3</span> 聴きながら入力練習</div>
   <textarea id="typing-box" rows="4" placeholder="ここに入力" oninput="updateStats()"></textarea>
 
-  <!-- Finish button -->
-  <div class="finish-row">
+  <!-- Action buttons -->
+  <div class="action-row">
+    <button class="btn-retry" id="btn-retry" onclick="retryTyping()" disabled>
+      <i class="ti ti-refresh" aria-hidden="true"></i> 再挑戦
+    </button>
+    <button class="btn-new" id="btn-new" onclick="generateText()" disabled>
+      <i class="ti ti-plus" aria-hidden="true"></i> 新しい問題
+    </button>
     <span class="hint-enter">Enter で終了</span>
     <button class="btn-finish" id="btn-finish" onclick="finishTyping()" disabled>
       <i class="ti ti-check" aria-hidden="true"></i> 入力終了
@@ -413,6 +432,7 @@
   <!-- Stats -->
   <div class="stats">
     <div class="stat" id="s-chars"><div class="val" id="stat-chars">0</div><div class="lbl">入力文字数</div></div>
+    <div class="stat" id="s-rate"><div class="val" id="stat-rate">—</div><div class="lbl">入力率</div></div>
     <div class="stat" id="s-wpm"><div class="val" id="stat-wpm">—</div><div class="lbl">文字/分</div></div>
     <div class="stat" id="s-time"><div class="val" id="stat-time">0:00</div><div class="lbl">経過時間</div></div>
   </div>
@@ -463,6 +483,8 @@
       credit.style.display = 'block';
 
       document.getElementById('btn-play').disabled = false;
+      document.getElementById('btn-retry').disabled = false;
+      document.getElementById('btn-new').disabled = false;
       document.getElementById('btn-finish').disabled = false;
       document.getElementById('typing-box').value = '';
     } catch (e) {
@@ -499,8 +521,10 @@
     div.innerHTML = page.extract;
     let text = (div.textContent || '').replace(/\s+/g, ' ').trim();
 
-    text = text.replace(/（[^）]{0,20}[：:][^）]*）/g, '');
+    // 括弧書きをすべて除去（読みがな・英語表記など）
+    text = text.replace(/（[^）]*）/g, '');
     text = text.replace(/\(/g, '（').replace(/\)/g, '）');
+    text = text.replace(/（[^）]*）/g, '');
     text = text.replace(/!/g, '！').replace(/\?/g, '？');
     text = text.replace(/([^\x00-\x7F])\s+([^\x00-\x7F])/g, '$1$2');
     text = text.replace(/\s+/g, ' ').trim();
@@ -527,15 +551,13 @@
     const t = currentText;
     const end = Math.min(charIndex + (charLen || 1), t.length);
     document.getElementById('text-box').innerHTML =
-      '<span class="spoken">'  + esc(t.slice(0, charIndex)) + '</span>' +
+      '<span class="spoken">'   + esc(t.slice(0, charIndex)) + '</span>' +
       '<span class="speaking">' + esc(t.slice(charIndex, end)) + '</span>' +
       '<span class="unspoken">' + esc(t.slice(end)) + '</span>';
   }
 
   function resetTextDisplay() {
-    if (currentText) {
-      document.getElementById('text-box').textContent = currentText;
-    }
+    if (currentText) document.getElementById('text-box').textContent = currentText;
   }
 
   /* ---- 速度ボタン ---- */
@@ -543,9 +565,7 @@
     currentRate = parseFloat(btn.dataset.rate);
     document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    if (window.speechSynthesis.speaking) {
-      startSpeech();
-    }
+    if (window.speechSynthesis.speaking) startSpeech();
   }
 
   /* ---- 音声読み上げ ---- */
@@ -589,6 +609,14 @@
     }
   }
 
+  /* ---- 再挑戦 ---- */
+  function retryTyping() {
+    stopSpeech();
+    resetStats();
+    document.getElementById('typing-box').value = '';
+    document.getElementById('typing-box').focus();
+  }
+
   /* ---- 入力終了 ---- */
   function finishTyping() {
     if (finished || !startTime) return;
@@ -598,13 +626,17 @@
     const elapsed = Math.floor((Date.now() - startTime) / 1000);
     const typed = document.getElementById('typing-box').value;
     const chars = typed.length;
+    const rate = currentText.length > 0
+      ? Math.round(chars / currentText.length * 100) + '%'
+      : '—';
     const wpm = elapsed > 0 ? Math.round(chars / (elapsed / 60)) : 0;
 
     document.getElementById('stat-chars').textContent = chars;
+    document.getElementById('stat-rate').textContent = rate;
     document.getElementById('stat-wpm').textContent = wpm;
     document.getElementById('stat-time').textContent = fmt(elapsed);
 
-    ['s-chars', 's-wpm', 's-time'].forEach(id => {
+    ['s-chars', 's-rate', 's-wpm', 's-time'].forEach(id => {
       document.getElementById(id).classList.add('finished');
     });
 
@@ -620,9 +652,14 @@
       if (finished) return;
       const elapsed = Math.floor((Date.now() - startTime) / 1000);
       document.getElementById('stat-time').textContent = fmt(elapsed);
-      const len = document.getElementById('typing-box').value.length;
+      const typed = document.getElementById('typing-box').value;
+      const len = typed.length;
       if (len > 0 && elapsed > 0) {
         document.getElementById('stat-wpm').textContent = Math.round(len / (elapsed / 60));
+      }
+      if (currentText.length > 0) {
+        document.getElementById('stat-rate').textContent =
+          Math.round(len / currentText.length * 100) + '%';
       }
     }, 1000);
   }
@@ -632,13 +669,14 @@
     startTime = null;
     finished = false;
     document.getElementById('stat-chars').textContent = '0';
+    document.getElementById('stat-rate').textContent = '—';
     document.getElementById('stat-wpm').textContent = '—';
     document.getElementById('stat-time').textContent = '0:00';
-    ['s-chars', 's-wpm', 's-time'].forEach(id => {
+    ['s-chars', 's-rate', 's-wpm', 's-time'].forEach(id => {
       document.getElementById(id).classList.remove('finished');
     });
     const finBtn = document.getElementById('btn-finish');
-    finBtn.disabled = true;
+    finBtn.disabled = false;
     finBtn.innerHTML = '<i class="ti ti-check"></i> 入力終了';
   }
 
@@ -647,6 +685,10 @@
     if (!startTime) startTimer();
     const typed = document.getElementById('typing-box').value;
     document.getElementById('stat-chars').textContent = typed.length;
+    if (currentText.length > 0) {
+      document.getElementById('stat-rate').textContent =
+        Math.round(typed.length / currentText.length * 100) + '%';
+    }
   }
 
   function fmt(sec) {
