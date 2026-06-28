@@ -493,7 +493,7 @@
   <!-- Stats -->
   <div class="stats">
     <div class="stat" id="s-chars"><div class="val" id="stat-chars">0</div><div class="lbl">入力文字数</div></div>
-    <div class="stat" id="s-rate"><div class="val" id="stat-rate">—</div><div class="lbl">入力率</div></div>
+    <div class="stat" id="s-rate"><div class="val" id="stat-rate">—</div><div class="lbl">文字包含率</div></div>
     <div class="stat" id="s-wpm"><div class="val" id="stat-wpm">—</div><div class="lbl">文字/分</div></div>
     <div class="stat" id="s-time"><div class="val" id="stat-time">0:00</div><div class="lbl">経過時間</div></div>
   </div>
@@ -739,7 +739,7 @@
     const typed = document.getElementById('typing-box').value;
     const chars = typed.length;
     const rate = currentText.length > 0
-      ? Math.round(chars / currentText.length * 100) + '%'
+      ? calcInclusion(typed, currentText) + '%'
       : '—';
     const wpm = elapsed > 0 ? Math.round(chars / (elapsed / 60)) : 0;
 
@@ -771,7 +771,7 @@
       }
       if (currentText.length > 0) {
         document.getElementById('stat-rate').textContent =
-          Math.round(len / currentText.length * 100) + '%';
+          calcInclusion(typed, currentText) + '%';
       }
     }, 1000);
   }
@@ -799,8 +799,22 @@
     document.getElementById('stat-chars').textContent = typed.length;
     if (currentText.length > 0) {
       document.getElementById('stat-rate').textContent =
-        Math.round(typed.length / currentText.length * 100) + '%';
+        calcInclusion(typed, currentText) + '%';
     }
+  }
+
+  /* ---- 文字包含率: 入力した文字が問題文に何文字含まれるか（重複考慮） ---- */
+  function calcInclusion(typed, source) {
+    if (!source.length) return 0;
+    const srcMap = {};
+    for (const ch of source) srcMap[ch] = (srcMap[ch] || 0) + 1;
+    const cntMap = {};
+    let matched = 0;
+    for (const ch of typed) {
+      cntMap[ch] = (cntMap[ch] || 0) + 1;
+      if (cntMap[ch] <= (srcMap[ch] || 0)) matched++;
+    }
+    return Math.round(matched / source.length * 100);
   }
 
   function fmt(sec) {
