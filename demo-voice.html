@@ -254,6 +254,26 @@
       color: var(--color-text-secondary);
       font-style: italic;
     }
+    .voice-hint {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      margin-bottom: 0.75rem;
+    }
+    .voice-error {
+      font-size: 12px;
+      color: #b45309;
+      background: #fef3c7;
+      border: 0.5px solid #fcd34d;
+      border-radius: var(--radius-md);
+      padding: 7px 12px;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    @media (prefers-color-scheme: dark) {
+      .voice-error { color: #fcd34d; background: #2d1f00; border-color: #78450a; }
+    }
 
     /* ---- Speed buttons ---- */
     .speed-row {
@@ -436,6 +456,8 @@
     </select>
     <span class="voice-none" id="voice-none" style="display:none">日本語音声が見つかりません</span>
   </div>
+  <p class="voice-hint">Chrome は「Google 日本語」、Edge は ☁ マーク付きの「Natural」音声がおすすめです。</p>
+  <p class="voice-error" id="voice-error" style="display:none"><i class="ti ti-alert-triangle"></i> この音声は使用できませんでした。別の音声を選んでください。</p>
 
   <!-- Speed buttons -->
   <div class="speed-row">
@@ -655,9 +677,9 @@
         renderProgress(e.charIndex, e.charLength);
       }
     };
-    utterance.onstart = () => setStatus(true);
+    utterance.onstart = () => { setStatus(true); document.getElementById('voice-error').style.display = 'none'; };
     utterance.onend   = () => { setStatus(false); resetTextDisplay(); };
-    utterance.onerror = () => { setStatus(false); resetTextDisplay(); };
+    utterance.onerror = () => { setStatus(false); resetTextDisplay(); document.getElementById('voice-error').style.display = 'flex'; };
 
     window.speechSynthesis.speak(utterance);
   }
