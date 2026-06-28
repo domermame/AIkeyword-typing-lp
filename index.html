@@ -288,6 +288,42 @@
       color: var(--color-purple);
     }
 
+    /* ---- Custom text section ---- */
+    .or-row {
+      display: flex; align-items: center; gap: 10px; margin: 0 0 0.5rem;
+    }
+    .or-line { flex: 1; height: 0.5px; background: var(--color-border); }
+    .or-text { font-size: 12px; color: var(--color-text-secondary); white-space: nowrap; }
+    .custom-toggle {
+      background: none; border: none; color: var(--color-purple);
+      font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 4px;
+      text-decoration: underline; text-underline-offset: 2px; padding: 0;
+    }
+    .custom-toggle:hover { opacity: 0.75; }
+    .custom-section {
+      background: var(--color-bg); border: 0.5px solid var(--color-border);
+      border-radius: var(--radius-md); padding: 0.75rem; margin-bottom: 0.75rem;
+    }
+    .custom-textarea {
+      width: 100%; padding: 8px 10px; border-radius: var(--radius-md);
+      border: 0.5px solid var(--color-border-md);
+      background: var(--color-bg-secondary); color: var(--color-text-primary);
+      font-size: 14px; font-family: inherit; line-height: 1.7;
+      resize: vertical; outline: none; margin-bottom: 0.4rem; min-height: 70px;
+    }
+    .custom-textarea:focus { border-color: var(--color-purple); }
+    .custom-footer { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .char-counter { font-size: 12px; color: var(--color-text-secondary); }
+    .char-counter.over { color: #dc2626; font-weight: 500; }
+    .custom-warning { font-size: 12px; color: #dc2626; }
+    .btn-use-custom {
+      margin-left: auto; padding: 7px 14px; background: var(--color-purple);
+      color: var(--color-purple-bg); border: none; border-radius: var(--radius-md);
+      font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 4px;
+    }
+    .btn-use-custom:hover { opacity: 0.88; }
+    .btn-use-custom:disabled { opacity: 0.4; cursor: not-allowed; }
+
     /* ---- Sections ---- */
     .section { padding: 2.5rem 1.5rem; }
     .section-title {
@@ -483,6 +519,29 @@
       <button id="btn-generate" onclick="generateDemo()">生成</button>
     </div>
     <div class="demo-error" id="demo-error"></div>
+
+    <!-- または：自分の文章 -->
+    <div class="or-row">
+      <div class="or-line"></div>
+      <span class="or-text">または</span>
+      <button class="custom-toggle" onclick="toggleCustomSection()">
+        自分の文章を使う <i class="ti ti-chevron-down" id="custom-toggle-icon"></i>
+      </button>
+      <div class="or-line"></div>
+    </div>
+    <div class="custom-section" id="custom-section" style="display:none">
+      <textarea class="custom-textarea" id="custom-text-input"
+        placeholder="練習したい文章をここに貼り付けてください（200文字以内）"
+        oninput="updateCustomCounter()"></textarea>
+      <div class="custom-footer">
+        <span class="char-counter" id="custom-counter">0 / 200</span>
+        <span class="custom-warning" id="custom-warning" style="display:none">200文字以内にしてください</span>
+        <button class="btn-use-custom" id="btn-use-custom" onclick="useCustomText()" disabled>
+          <i class="ti ti-check" aria-hidden="true"></i> この文章を使う
+        </button>
+      </div>
+    </div>
+
     <div class="demo-text" id="demo-text"><span class="char-pending">キーワードを入力して「生成」を押してください。</span></div>
     <div class="wiki-credit" id="wiki-credit" style="display:none"></div>
     <div class="demo-result" id="demo-result"></div>
@@ -832,6 +891,13 @@
     document.getElementById('kw-input').value = '';
     document.getElementById('kw-input').focus();
     setButtonState(false);
+    document.getElementById('custom-text-input').value = '';
+    document.getElementById('custom-counter').textContent = '0 / 200';
+    document.getElementById('custom-counter').classList.remove('over');
+    document.getElementById('custom-warning').style.display = 'none';
+    document.getElementById('btn-use-custom').disabled = true;
+    document.getElementById('custom-section').style.display = 'none';
+    document.getElementById('custom-toggle-icon').className = 'ti ti-chevron-down';
   }
 
   function togglePause() {
@@ -873,6 +939,45 @@
   }
 
   document.getElementById('typing-box').addEventListener('input', onTyping);
+
+  /* ---- 自分の文章 ---- */
+  const MAX_CUSTOM = 200;
+
+  function toggleCustomSection() {
+    const section = document.getElementById('custom-section');
+    const icon = document.getElementById('custom-toggle-icon');
+    const isOpen = section.style.display !== 'none';
+    section.style.display = isOpen ? 'none' : 'block';
+    icon.className = isOpen ? 'ti ti-chevron-down' : 'ti ti-chevron-up';
+  }
+
+  function updateCustomCounter() {
+    const len = document.getElementById('custom-text-input').value.length;
+    const counter = document.getElementById('custom-counter');
+    const warning = document.getElementById('custom-warning');
+    counter.textContent = len + ' / ' + MAX_CUSTOM;
+    const over = len > MAX_CUSTOM;
+    counter.classList.toggle('over', over);
+    warning.style.display = over ? 'inline' : 'none';
+    document.getElementById('btn-use-custom').disabled = over || len === 0;
+  }
+
+  function useCustomText() {
+    const text = document.getElementById('custom-text-input').value.trim();
+    if (!text || text.length > MAX_CUSTOM) return;
+
+    resetTimer();
+    finished = false;
+    paused = false;
+    document.getElementById('demo-error').style.display = 'none';
+    document.getElementById('wiki-credit').style.display = 'none';
+
+    currentText = text;
+    startPractice();
+
+    document.getElementById('custom-section').style.display = 'none';
+    document.getElementById('custom-toggle-icon').className = 'ti ti-chevron-down';
+  }
 </script>
 
 </body>
