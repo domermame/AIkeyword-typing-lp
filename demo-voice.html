@@ -54,356 +54,268 @@
 
     /* ---- Header ---- */
     .page-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
+      display: flex; align-items: center; gap: 12px;
       padding: 1.5rem 0 2rem;
       border-bottom: 0.5px solid var(--color-border);
       margin-bottom: 2rem;
     }
     .back-link {
-      color: var(--color-text-secondary);
-      text-decoration: none;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
+      color: var(--color-text-secondary); text-decoration: none;
+      font-size: 14px; display: flex; align-items: center; gap: 4px;
     }
     .back-link:hover { color: var(--color-text-primary); }
     .page-header h1 { font-size: 1.2rem; font-weight: 500; }
     .badge-voice {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      background: var(--color-teal-bg);
-      color: var(--color-teal);
-      font-size: 12px;
-      padding: 3px 10px;
-      border-radius: var(--radius-md);
-      margin-left: auto;
+      display: inline-flex; align-items: center; gap: 4px;
+      background: var(--color-teal-bg); color: var(--color-teal);
+      font-size: 12px; padding: 3px 10px; border-radius: var(--radius-md); margin-left: auto;
     }
 
     /* ---- Step labels ---- */
     .step-label {
-      font-size: 12px;
-      color: var(--color-text-secondary);
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      font-size: 12px; color: var(--color-text-secondary);
+      margin-bottom: 6px; display: flex; align-items: center; gap: 6px;
     }
     .step-num {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: var(--color-purple-bg);
-      color: var(--color-purple);
-      font-size: 11px;
-      font-weight: 500;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--color-purple-bg); color: var(--color-purple);
+      font-size: 11px; font-weight: 500;
+      display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
 
     /* ---- Keyword input ---- */
-    .input-row {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 0.5rem;
-    }
+    .input-row { display: flex; gap: 8px; margin-bottom: 0.5rem; }
     .input-row input {
-      flex: 1;
-      padding: 10px 14px;
-      border-radius: var(--radius-md);
-      border: 0.5px solid var(--color-border-md);
-      background: var(--color-bg);
-      color: var(--color-text-primary);
-      font-size: 15px;
-      outline: none;
+      flex: 1; padding: 10px 14px;
+      border-radius: var(--radius-md); border: 0.5px solid var(--color-border-md);
+      background: var(--color-bg); color: var(--color-text-primary);
+      font-size: 15px; outline: none;
     }
     .input-row input:focus { border-color: var(--color-purple); }
     .btn-generate {
-      padding: 10px 20px;
-      background: var(--color-purple);
-      color: var(--color-purple-bg);
-      border: none;
-      border-radius: var(--radius-md);
-      font-size: 14px;
-      cursor: pointer;
-      white-space: nowrap;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      padding: 10px 20px; background: var(--color-purple); color: var(--color-purple-bg);
+      border: none; border-radius: var(--radius-md); font-size: 14px; cursor: pointer;
+      white-space: nowrap; display: flex; align-items: center; gap: 6px;
     }
     .btn-generate:hover { opacity: 0.88; }
     .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
 
     /* ---- Error / Credit ---- */
     .demo-error {
-      display: none;
-      background: var(--color-bg-secondary);
-      border: 0.5px solid var(--color-border);
-      border-radius: var(--radius-md);
-      padding: 8px 12px;
-      font-size: 13px;
-      color: var(--color-text-secondary);
-      margin-bottom: 1rem;
+      display: none; background: var(--color-bg-secondary);
+      border: 0.5px solid var(--color-border); border-radius: var(--radius-md);
+      padding: 8px 12px; font-size: 13px; color: var(--color-text-secondary); margin-bottom: 1rem;
     }
     .wiki-credit {
-      display: none;
-      font-size: 11px;
-      color: var(--color-text-secondary);
-      text-align: right;
-      margin-bottom: 0.75rem;
+      display: none; font-size: 11px; color: var(--color-text-secondary);
+      text-align: right; margin-bottom: 0.75rem;
     }
     .wiki-credit a { color: var(--color-text-secondary); }
 
     /* ---- Generated text box ---- */
     .text-box {
-      background: var(--color-bg-secondary);
-      border: 0.5px solid var(--color-border);
-      border-radius: var(--radius-lg);
-      padding: 1.25rem;
-      font-size: 15px;
-      line-height: 1.9;
-      margin-bottom: 1rem;
-      min-height: 6rem;
-      color: var(--color-text-secondary);
+      background: var(--color-bg-secondary); border: 0.5px solid var(--color-border);
+      border-radius: var(--radius-lg); padding: 1.25rem;
+      font-size: 15px; line-height: 2.2; margin-bottom: 0.5rem;
+      min-height: 6rem; color: var(--color-text-secondary);
+      cursor: text; user-select: text;
     }
+    .text-box .char-span { display: inline; }
     .text-box .spoken   { color: var(--color-text-secondary); opacity: 0.5; }
     .text-box .speaking { background: var(--color-teal); color: #ffffff; border-radius: 3px; padding: 1px 2px; }
     .text-box .unspoken { color: var(--color-text-primary); }
 
+    /* ---- Ruby / furigana ---- */
+    ruby { display: inline ruby; }
+    rt {
+      font-size: 0.55em;
+      color: var(--color-purple);
+      letter-spacing: 0.02em;
+    }
+    .annotated-text {
+      border-bottom: 1.5px solid var(--color-purple);
+      color: var(--color-text-primary);
+    }
+
+    /* ---- Furigana hint ---- */
+    .furigana-hint {
+      font-size: 11px; color: var(--color-text-secondary);
+      margin-bottom: 0.5rem; display: none;
+    }
+    .furigana-hint.visible { display: block; }
+
+    /* ---- Annotation list (chips) ---- */
+    .annotation-list {
+      display: none;
+      background: var(--color-purple-bg);
+      border: 0.5px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 8px 12px;
+      margin-bottom: 1rem;
+      font-size: 13px;
+    }
+    .ann-list-label {
+      font-size: 11px; color: var(--color-purple);
+      margin-bottom: 6px; display: flex; align-items: center; gap: 4px;
+    }
+    .ann-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .ann-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: var(--color-bg); border: 0.5px solid var(--color-border-md);
+      border-radius: 20px; padding: 3px 10px; font-size: 12px;
+      color: var(--color-text-primary);
+    }
+    .ann-arrow { color: var(--color-purple); font-weight: 500; }
+    .ann-remove {
+      background: none; border: none; cursor: pointer;
+      color: var(--color-text-secondary); font-size: 13px; padding: 0 2px; line-height: 1;
+    }
+    .ann-remove:hover { color: var(--color-text-primary); }
+
+    /* ---- Furigana popup ---- */
+    .furigana-popup {
+      position: fixed;
+      background: var(--color-bg);
+      border: 0.5px solid var(--color-border-md);
+      border-radius: var(--radius-lg);
+      padding: 12px 14px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+      z-index: 200;
+      min-width: 260px;
+      display: none;
+    }
+    .popup-label {
+      font-size: 13px; color: var(--color-text-secondary); margin-bottom: 8px;
+    }
+    .popup-label strong { color: var(--color-text-primary); }
+    .popup-row { display: flex; gap: 6px; align-items: center; }
+    .popup-row input {
+      flex: 1; padding: 7px 10px;
+      border-radius: var(--radius-md); border: 0.5px solid var(--color-border-md);
+      background: var(--color-bg); color: var(--color-text-primary);
+      font-size: 14px; outline: none;
+    }
+    .popup-row input:focus { border-color: var(--color-purple); }
+    .popup-btn-ok {
+      padding: 7px 14px; background: var(--color-purple); color: var(--color-purple-bg);
+      border: none; border-radius: var(--radius-md); font-size: 13px; cursor: pointer;
+      white-space: nowrap;
+    }
+    .popup-btn-ok:hover { opacity: 0.88; }
+    .popup-btn-cancel {
+      padding: 7px 10px; background: transparent; color: var(--color-text-secondary);
+      border: 0.5px solid var(--color-border-md); border-radius: var(--radius-md);
+      font-size: 13px; cursor: pointer;
+    }
+    .popup-btn-cancel:hover { background: var(--color-bg-secondary); }
+
     /* ---- Voice controls ---- */
     .voice-controls {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      margin-bottom: 1rem;
-      flex-wrap: wrap;
+      display: flex; gap: 10px; align-items: center; margin-bottom: 1rem; flex-wrap: wrap;
     }
     .btn-play {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 20px;
-      background: var(--color-teal);
-      color: var(--color-teal-bg);
-      border: none;
-      border-radius: var(--radius-md);
-      font-size: 14px;
-      cursor: pointer;
-      font-weight: 500;
+      display: flex; align-items: center; gap: 8px; padding: 10px 20px;
+      background: var(--color-teal); color: var(--color-teal-bg);
+      border: none; border-radius: var(--radius-md); font-size: 14px; cursor: pointer; font-weight: 500;
     }
     .btn-play:hover { opacity: 0.88; }
     .btn-play:disabled { opacity: 0.4; cursor: not-allowed; }
     .btn-stop {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 20px;
-      background: transparent;
-      color: var(--color-text-secondary);
-      border: 0.5px solid var(--color-border-md);
-      border-radius: var(--radius-md);
-      font-size: 14px;
-      cursor: pointer;
+      display: flex; align-items: center; gap: 8px; padding: 10px 20px;
+      background: transparent; color: var(--color-text-secondary);
+      border: 0.5px solid var(--color-border-md); border-radius: var(--radius-md);
+      font-size: 14px; cursor: pointer;
     }
     .btn-stop:hover { background: var(--color-bg-secondary); }
     .status-badge {
-      font-size: 12px;
-      padding: 4px 10px;
-      border-radius: var(--radius-md);
-      background: var(--color-bg-secondary);
-      color: var(--color-text-secondary);
+      font-size: 12px; padding: 4px 10px; border-radius: var(--radius-md);
+      background: var(--color-bg-secondary); color: var(--color-text-secondary);
       border: 0.5px solid var(--color-border);
     }
-    .status-badge.playing {
-      background: var(--color-teal-bg);
-      color: var(--color-teal);
-      border-color: transparent;
-    }
+    .status-badge.playing { background: var(--color-teal-bg); color: var(--color-teal); border-color: transparent; }
 
     /* ---- Voice select ---- */
-    .voice-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 0.75rem;
-    }
-    .voice-row label {
-      font-size: 13px;
-      color: var(--color-text-secondary);
-      flex-shrink: 0;
-    }
+    .voice-row { display: flex; align-items: center; gap: 8px; margin-bottom: 0.5rem; }
+    .voice-row label { font-size: 13px; color: var(--color-text-secondary); flex-shrink: 0; }
     #voice-select {
-      flex: 1;
-      padding: 6px 10px;
-      border-radius: var(--radius-md);
+      flex: 1; padding: 6px 10px; border-radius: var(--radius-md);
       border: 0.5px solid var(--color-border-md);
-      background: var(--color-bg);
-      color: var(--color-text-primary);
-      font-size: 13px;
-      outline: none;
-      cursor: pointer;
+      background: var(--color-bg); color: var(--color-text-primary);
+      font-size: 13px; outline: none; cursor: pointer;
     }
     #voice-select:focus { border-color: var(--color-teal); }
-    .voice-none {
-      font-size: 12px;
-      color: var(--color-text-secondary);
-      font-style: italic;
-    }
-    .voice-hint {
-      font-size: 12px;
-      color: var(--color-text-secondary);
-      margin-bottom: 0.75rem;
-    }
+    .voice-none { font-size: 12px; color: var(--color-text-secondary); font-style: italic; }
+    .voice-hint { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 0.5rem; }
     .voice-error {
-      font-size: 12px;
-      color: #b45309;
-      background: #fef3c7;
-      border: 0.5px solid #fcd34d;
-      border-radius: var(--radius-md);
-      padding: 7px 12px;
-      margin-bottom: 0.75rem;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      font-size: 12px; color: #b45309; background: #fef3c7;
+      border: 0.5px solid #fcd34d; border-radius: var(--radius-md);
+      padding: 7px 12px; margin-bottom: 0.75rem;
+      display: flex; align-items: center; gap: 6px;
     }
     @media (prefers-color-scheme: dark) {
       .voice-error { color: #fcd34d; background: #2d1f00; border-color: #78450a; }
     }
 
     /* ---- Speed buttons ---- */
-    .speed-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 1.5rem;
-    }
-    .speed-label {
-      font-size: 13px;
-      color: var(--color-text-secondary);
-      flex-shrink: 0;
-    }
+    .speed-row { display: flex; align-items: center; gap: 8px; margin-bottom: 1.5rem; }
+    .speed-label { font-size: 13px; color: var(--color-text-secondary); flex-shrink: 0; }
     .speed-btns { display: flex; gap: 6px; }
     .speed-btn {
-      padding: 6px 14px;
-      border-radius: var(--radius-md);
+      padding: 6px 14px; border-radius: var(--radius-md);
       border: 0.5px solid var(--color-border-md);
-      background: transparent;
-      color: var(--color-text-secondary);
-      font-size: 13px;
-      cursor: pointer;
+      background: transparent; color: var(--color-text-secondary); font-size: 13px; cursor: pointer;
     }
     .speed-btn:hover { background: var(--color-bg-secondary); }
-    .speed-btn.active {
-      background: var(--color-teal-bg);
-      color: var(--color-teal);
-      border-color: transparent;
-      font-weight: 500;
-    }
+    .speed-btn.active { background: var(--color-teal-bg); color: var(--color-teal); border-color: transparent; font-weight: 500; }
 
     /* ---- Typing area ---- */
     #typing-box {
-      width: 100%;
-      padding: 12px 14px;
-      border-radius: var(--radius-md);
+      width: 100%; padding: 12px 14px; border-radius: var(--radius-md);
       border: 0.5px solid var(--color-border-md);
-      background: var(--color-bg);
-      color: var(--color-text-primary);
-      font-size: 15px;
-      font-family: inherit;
-      line-height: 1.7;
-      resize: none;
-      outline: none;
-      margin-bottom: 0.75rem;
+      background: var(--color-bg); color: var(--color-text-primary);
+      font-size: 15px; font-family: inherit; line-height: 1.7;
+      resize: none; outline: none; margin-bottom: 0.75rem;
     }
     #typing-box:focus { border-color: var(--color-purple); }
 
-    /* ---- Action buttons row (再挑戦 / 新しい問題 / 入力終了) ---- */
+    /* ---- Action buttons ---- */
     .action-row {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      margin-bottom: 1rem;
-      flex-wrap: wrap;
+      display: flex; gap: 8px; align-items: center; margin-bottom: 1rem; flex-wrap: wrap;
     }
-    .btn-retry {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 9px 16px;
-      background: transparent;
-      color: var(--color-text-secondary);
-      border: 0.5px solid var(--color-border-md);
-      border-radius: var(--radius-md);
-      font-size: 14px;
-      cursor: pointer;
+    .btn-retry, .btn-new {
+      display: flex; align-items: center; gap: 6px; padding: 9px 16px;
+      background: transparent; color: var(--color-text-secondary);
+      border: 0.5px solid var(--color-border-md); border-radius: var(--radius-md);
+      font-size: 14px; cursor: pointer;
     }
-    .btn-retry:hover { background: var(--color-bg-secondary); }
-    .btn-retry:disabled { opacity: 0.4; cursor: not-allowed; }
-    .btn-new {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 9px 16px;
-      background: transparent;
-      color: var(--color-text-secondary);
-      border: 0.5px solid var(--color-border-md);
-      border-radius: var(--radius-md);
-      font-size: 14px;
-      cursor: pointer;
-    }
-    .btn-new:hover { background: var(--color-bg-secondary); }
-    .btn-new:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-retry:hover, .btn-new:hover { background: var(--color-bg-secondary); }
+    .btn-retry:disabled, .btn-new:disabled { opacity: 0.4; cursor: not-allowed; }
     .btn-finish {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 9px 18px;
-      background: var(--color-purple);
-      color: var(--color-purple-bg);
-      border: none;
-      border-radius: var(--radius-md);
-      font-size: 14px;
-      cursor: pointer;
-      font-weight: 500;
+      display: flex; align-items: center; gap: 6px; padding: 9px 18px;
+      background: var(--color-purple); color: var(--color-purple-bg);
+      border: none; border-radius: var(--radius-md); font-size: 14px; cursor: pointer; font-weight: 500;
       margin-left: auto;
     }
     .btn-finish:hover { opacity: 0.88; }
     .btn-finish:disabled { opacity: 0.4; cursor: not-allowed; }
-    .hint-enter {
-      font-size: 11px;
-      color: var(--color-text-secondary);
-    }
+    .hint-enter { font-size: 11px; color: var(--color-text-secondary); }
 
     /* ---- Stats ---- */
     .stats { display: flex; gap: 10px; margin-bottom: 2rem; }
     .stat {
-      flex: 1;
-      background: var(--color-bg-secondary);
-      border-radius: var(--radius-md);
-      padding: 10px 8px;
-      text-align: center;
-      border: 0.5px solid var(--color-border);
+      flex: 1; background: var(--color-bg-secondary); border-radius: var(--radius-md);
+      padding: 10px 8px; text-align: center; border: 0.5px solid var(--color-border);
     }
     .stat .val { font-size: 20px; font-weight: 500; }
     .stat .lbl { font-size: 10px; color: var(--color-text-secondary); margin-top: 2px; }
     .stat.finished { border-color: var(--color-purple); background: var(--color-purple-bg); }
     .stat.finished .val { color: var(--color-purple); }
 
-    /* ---- Tip box ---- */
+    /* ---- Tip ---- */
     .tip {
-      background: var(--color-bg-info);
-      border-radius: var(--radius-md);
-      padding: 1rem 1.25rem;
-      font-size: 13px;
-      color: var(--color-text-info);
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
+      background: var(--color-bg-info); border-radius: var(--radius-md);
+      padding: 1rem 1.25rem; font-size: 13px; color: var(--color-text-info);
+      display: flex; gap: 10px; align-items: flex-start;
     }
     .tip i { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
 
@@ -411,6 +323,17 @@
   </style>
 </head>
 <body>
+
+<!-- ふりがな入力ポップアップ -->
+<div class="furigana-popup" id="furigana-popup">
+  <div class="popup-label">「<strong id="popup-selected-text"></strong>」のふりがな</div>
+  <div class="popup-row">
+    <input type="text" id="furigana-input" placeholder="ひらがなで入力" autocomplete="off" />
+    <button class="popup-btn-ok" onclick="confirmFurigana()">追加</button>
+    <button class="popup-btn-cancel" onclick="hideFuriganaPopup()">×</button>
+  </div>
+</div>
+
 <div class="container">
 
   <!-- Header -->
@@ -420,7 +343,7 @@
     <span class="badge-voice"><i class="ti ti-volume"></i> 音声あり</span>
   </div>
 
-  <!-- Step 1: キーワード入力 -->
+  <!-- Step 1 -->
   <div class="step-label"><span class="step-num">1</span> キーワードを入力して練習文を生成</div>
   <div class="input-row">
     <input type="text" id="kw-input" placeholder="例：要約筆記、バリアフリー、人工知能…" onkeydown="if(event.key==='Enter')generateText()" />
@@ -431,10 +354,20 @@
   <div class="demo-error" id="demo-error"></div>
   <div class="wiki-credit" id="wiki-credit"></div>
 
-  <!-- Generated text -->
+  <!-- Step 2 -->
   <div class="step-label"><span class="step-num">2</span> 生成された練習文を音声で聴く</div>
   <div class="text-box" id="text-box">
     キーワードを入力して「生成」を押すと、練習文がここに表示されます。
+  </div>
+  <p class="furigana-hint" id="furigana-hint">
+    <i class="ti ti-text-size" aria-hidden="true"></i>
+    読み間違えそうな箇所をドラッグで選択してふりがなを追加できます。
+  </p>
+
+  <!-- ふりがな一覧 -->
+  <div class="annotation-list" id="annotation-list">
+    <div class="ann-list-label"><i class="ti ti-text-size" aria-hidden="true"></i> ふりがな設定（読み上げ時に反映）</div>
+    <div class="ann-chips" id="annotation-items"></div>
   </div>
 
   <!-- Voice controls -->
@@ -457,9 +390,11 @@
     <span class="voice-none" id="voice-none" style="display:none">日本語音声が見つかりません</span>
   </div>
   <p class="voice-hint">Chrome は「Google 日本語」、Edge は ☁ マーク付きの「Natural」音声がおすすめです。</p>
-  <p class="voice-error" id="voice-error" style="display:none"><i class="ti ti-alert-triangle"></i> この音声は使用できませんでした。別の音声を選んでください。</p>
+  <p class="voice-error" id="voice-error" style="display:none">
+    <i class="ti ti-alert-triangle"></i> この音声は使用できませんでした。別の音声を選んでください。
+  </p>
 
-  <!-- Speed buttons -->
+  <!-- Speed -->
   <div class="speed-row">
     <span class="speed-label"><i class="ti ti-gauge" aria-hidden="true"></i> 読み上げ速度</span>
     <div class="speed-btns">
@@ -472,7 +407,7 @@
 
   <div class="divider"></div>
 
-  <!-- Step 3: タイピング -->
+  <!-- Step 3 -->
   <div class="step-label"><span class="step-num">3</span> 聴きながら入力練習</div>
   <textarea id="typing-box" rows="4" placeholder="ここに入力" oninput="updateStats()"></textarea>
 
@@ -513,35 +448,30 @@
   let timerInterval = null;
   let finished = false;
   let jaVoices = [];
+  let annotations = [];   // [{start, end, reading}]
+  let pendingAnn = null;  // {start, end, text} — 確定前の選択
 
-  /* ---- 音声一覧の読み込み ---- */
+  /* ---- 音声一覧 ---- */
   function loadVoices() {
     const all = window.speechSynthesis.getVoices();
     jaVoices = all.filter(v => v.lang.startsWith('ja'));
     const sel = document.getElementById('voice-select');
     const none = document.getElementById('voice-none');
     if (jaVoices.length === 0) {
-      sel.style.display = 'none';
-      none.style.display = 'inline';
-      return;
+      sel.style.display = 'none'; none.style.display = 'inline'; return;
     }
-    sel.style.display = '';
-    none.style.display = 'none';
+    sel.style.display = ''; none.style.display = 'none';
     sel.innerHTML = '';
     jaVoices.forEach((v, i) => {
       const opt = document.createElement('option');
       opt.value = i;
-      // ☁ マークでネットワーク音声（高品質）を区別
       opt.textContent = v.name + (v.localService ? '' : ' ☁');
       sel.appendChild(opt);
     });
   }
-
   function onVoiceChange() {
-    // 読み上げ中なら新しい音声で即再スタート
     if (window.speechSynthesis.speaking) startSpeech();
   }
-
   speechSynthesis.onvoiceschanged = loadVoices;
   loadVoices();
 
@@ -554,22 +484,22 @@
     const errBox = document.getElementById('demo-error');
     const credit = document.getElementById('wiki-credit');
 
-    btn.innerHTML = '取得中…';
-    btn.disabled = true;
-    errBox.style.display = 'none';
-    credit.style.display = 'none';
+    btn.innerHTML = '取得中…'; btn.disabled = true;
+    errBox.style.display = 'none'; credit.style.display = 'none';
     document.getElementById('text-box').textContent = 'Wikipediaから記事を取得しています…';
     stopSpeech();
     resetStats();
+    clearAnnotations();
 
     try {
       const result = await fetchWikipedia(kw);
       currentText = result.text;
-      document.getElementById('text-box').textContent = currentText;
+      annotations = [];
+      renderTextWithAnnotations();
+      document.getElementById('furigana-hint').classList.add('visible');
 
       const note = result.redirected
-        ? '「' + kw + '」→「' + result.title + '」にリダイレクト&ensp;|&ensp;'
-        : '';
+        ? '「' + kw + '」→「' + result.title + '」にリダイレクト&ensp;|&ensp;' : '';
       credit.innerHTML = note + '出典: <a href="https://ja.wikipedia.org/wiki/'
         + encodeURIComponent(result.title) + '" target="_blank" rel="noopener">Wikipedia「'
         + result.title + '」</a>';
@@ -581,12 +511,10 @@
       document.getElementById('btn-finish').disabled = false;
       document.getElementById('typing-box').value = '';
     } catch (e) {
-      errBox.textContent = e.message;
-      errBox.style.display = 'block';
+      errBox.textContent = e.message; errBox.style.display = 'block';
       document.getElementById('text-box').textContent = 'キーワードを入力して「生成」を押してください。';
     } finally {
-      btn.innerHTML = '<i class="ti ti-sparkles"></i> 生成';
-      btn.disabled = false;
+      btn.innerHTML = '<i class="ti ti-sparkles"></i> 生成'; btn.disabled = false;
     }
   }
 
@@ -600,47 +528,63 @@
     const url = 'https://ja.wikipedia.org/w/api.php?action=query'
       + '&titles=' + encodeURIComponent(title)
       + '&prop=extracts&exintro=true&exsentences=4&redirects=1&format=json&origin=*';
-
     const res = await fetch(url);
     if (!res.ok) throw new Error('ネットワークエラーが発生しました。');
-
     const data = await res.json();
     const page = Object.values(data.query.pages)[0];
     if (page.missing !== undefined) return null;
-
     const redirected = page.title !== title;
-
     const div = document.createElement('div');
     div.innerHTML = page.extract;
     let text = (div.textContent || '').replace(/\s+/g, ' ').trim();
-
-    // 括弧書きをすべて除去（読みがな・英語表記など）
     text = text.replace(/（[^）]*）/g, '');
     text = text.replace(/\(/g, '（').replace(/\)/g, '）');
     text = text.replace(/（[^）]*）/g, '');
     text = text.replace(/!/g, '！').replace(/\?/g, '？');
     text = text.replace(/([^\x00-\x7F])\s+([^\x00-\x7F])/g, '$1$2');
     text = text.replace(/\s+/g, ' ').trim();
-
     if (text.replace(/[。、\s]/g, '').length < 15) return null;
-
     if (text.length > 250) {
       const cut = text.indexOf('。', 100);
       text = cut !== -1 && cut < 280 ? text.slice(0, cut + 1) : text.slice(0, 200) + '。';
     }
-
     if (!text.endsWith('。')) text += '。';
-
     return { text, title: page.title, redirected };
   }
 
-  /* ---- テキストのエスケープ ---- */
+  /* ---- テキスト表示（ルビ付き） ---- */
   function esc(s) {
     return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
-  /* ---- 読み上げ進捗の色付け ---- */
+  function renderTextWithAnnotations() {
+    if (!currentText) return;
+    const sorted = [...annotations].sort((a, b) => a.start - b.start);
+    let html = '';
+    let pos = 0;
+    for (const ann of sorted) {
+      for (let i = pos; i < ann.start; i++) {
+        html += '<span class="char-span" data-pos="' + i + '">' + esc(currentText[i]) + '</span>';
+      }
+      html += '<ruby>'
+        + '<span class="annotated-text" data-ann-s="' + ann.start + '" data-ann-e="' + ann.end + '">'
+        + esc(currentText.slice(ann.start, ann.end))
+        + '</span><rt>' + esc(ann.reading) + '</rt></ruby>';
+      pos = ann.end;
+    }
+    for (let i = pos; i < currentText.length; i++) {
+      html += '<span class="char-span" data-pos="' + i + '">' + esc(currentText[i]) + '</span>';
+    }
+    document.getElementById('text-box').innerHTML = html;
+  }
+
+  function resetTextDisplay() {
+    renderTextWithAnnotations();
+  }
+
+  /* ---- 読み上げ進捗ハイライト（ふりがななし時のみ） ---- */
   function renderProgress(charIndex, charLen) {
+    if (annotations.length > 0) return; // ふりがなあり時はスキップ
     const t = currentText;
     const end = Math.min(charIndex + (charLen || 1), t.length);
     document.getElementById('text-box').innerHTML =
@@ -649,8 +593,126 @@
       '<span class="unspoken">' + esc(t.slice(end)) + '</span>';
   }
 
-  function resetTextDisplay() {
-    if (currentText) document.getElementById('text-box').textContent = currentText;
+  /* ---- ふりがな入力：選択検出 ---- */
+  document.getElementById('text-box').addEventListener('mouseup', function() {
+    // 少し待ってから取得（選択確定を待つ）
+    setTimeout(handleTextSelection, 10);
+  });
+
+  function handleTextSelection() {
+    const sel = window.getSelection();
+    if (!sel || sel.isCollapsed || !sel.toString().trim()) return;
+
+    const range = sel.getRangeAt(0);
+    const textBox = document.getElementById('text-box');
+    if (!textBox.contains(range.commonAncestorContainer)) return;
+
+    let startPos = Infinity, endPos = -1;
+
+    // char-span 要素から位置を取得
+    textBox.querySelectorAll('.char-span').forEach(span => {
+      try {
+        if (range.intersectsNode(span)) {
+          const p = parseInt(span.dataset.pos);
+          if (p < startPos) startPos = p;
+          if (p > endPos) endPos = p;
+        }
+      } catch(_) {}
+    });
+
+    // 既存ルビ（annotated-text）も対象に
+    textBox.querySelectorAll('.annotated-text').forEach(span => {
+      try {
+        if (range.intersectsNode(span)) {
+          const s = parseInt(span.dataset.annS);
+          const e = parseInt(span.dataset.annE);
+          if (s < startPos) startPos = s;
+          if (e - 1 > endPos) endPos = e - 1;
+        }
+      } catch(_) {}
+    });
+
+    if (startPos === Infinity || endPos === -1) return;
+
+    const selectedText = currentText.slice(startPos, endPos + 1);
+    const rect = range.getBoundingClientRect();
+    pendingAnn = { start: startPos, end: endPos + 1, text: selectedText };
+    showFuriganaPopup(selectedText, rect);
+  }
+
+  function showFuriganaPopup(selectedText, rect) {
+    document.getElementById('popup-selected-text').textContent = selectedText;
+    document.getElementById('furigana-input').value = '';
+    const popup = document.getElementById('furigana-popup');
+    popup.style.display = 'block';
+    // ビューポート基準で配置
+    const top = rect.bottom + 8;
+    const left = Math.min(rect.left, window.innerWidth - 280);
+    popup.style.top = Math.max(8, top) + 'px';
+    popup.style.left = Math.max(8, left) + 'px';
+    setTimeout(() => document.getElementById('furigana-input').focus(), 30);
+  }
+
+  function hideFuriganaPopup() {
+    document.getElementById('furigana-popup').style.display = 'none';
+    pendingAnn = null;
+    window.getSelection()?.removeAllRanges();
+  }
+
+  function confirmFurigana() {
+    const reading = document.getElementById('furigana-input').value.trim();
+    if (!reading || !pendingAnn) { hideFuriganaPopup(); return; }
+    // 重複・重なり削除してから追加
+    annotations = annotations.filter(a => a.end <= pendingAnn.start || a.start >= pendingAnn.end);
+    annotations.push({ start: pendingAnn.start, end: pendingAnn.end, reading });
+    hideFuriganaPopup();
+    renderTextWithAnnotations();
+    renderAnnotationList();
+  }
+
+  function removeAnnotationByCoords(start, end) {
+    annotations = annotations.filter(a => !(a.start === start && a.end === end));
+    renderTextWithAnnotations();
+    renderAnnotationList();
+  }
+
+  function renderAnnotationList() {
+    const list = document.getElementById('annotation-list');
+    const items = document.getElementById('annotation-items');
+    if (annotations.length === 0) { list.style.display = 'none'; return; }
+    list.style.display = 'block';
+    const sorted = [...annotations].sort((a, b) => a.start - b.start);
+    items.innerHTML = sorted.map(ann =>
+      '<span class="ann-chip">'
+      + esc(currentText.slice(ann.start, ann.end))
+      + '<span class="ann-arrow"> → </span>'
+      + esc(ann.reading)
+      + ' <button class="ann-remove" onclick="removeAnnotationByCoords('
+      + ann.start + ',' + ann.end + ')">×</button>'
+      + '</span>'
+    ).join('');
+  }
+
+  function clearAnnotations() {
+    annotations = [];
+    document.getElementById('annotation-list').style.display = 'none';
+    document.getElementById('annotation-items').innerHTML = '';
+    document.getElementById('furigana-hint').classList.remove('visible');
+  }
+
+  /* ---- TTS テキスト（ふりがなを置換） ---- */
+  function buildTTSText() {
+    if (annotations.length === 0) return currentText;
+    const sorted = [...annotations].sort((a, b) => a.start - b.start);
+    let result = '';
+    let pos = 0;
+    for (const ann of sorted) {
+      result += currentText.slice(pos, ann.start);
+      result += ann.reading;
+      pos = ann.end;
+    }
+    result += currentText.slice(pos);
+    return result;
   }
 
   /* ---- 速度ボタン ---- */
@@ -666,20 +728,26 @@
     if (!currentText) return;
     stopSpeech();
 
-    const utterance = new SpeechSynthesisUtterance(currentText);
+    const ttsText = buildTTSText();
+    const utterance = new SpeechSynthesisUtterance(ttsText);
     utterance.lang = 'ja-JP';
     utterance.rate = currentRate;
     const voiceIdx = parseInt(document.getElementById('voice-select').value);
     if (jaVoices[voiceIdx]) utterance.voice = jaVoices[voiceIdx];
 
     utterance.onboundary = (e) => {
-      if (e.name === 'word' || e.name === 'sentence') {
-        renderProgress(e.charIndex, e.charLength);
-      }
+      if (e.name === 'word' || e.name === 'sentence') renderProgress(e.charIndex, e.charLength);
     };
-    utterance.onstart = () => { setStatus(true); document.getElementById('voice-error').style.display = 'none'; };
-    utterance.onend   = () => { setStatus(false); resetTextDisplay(); };
-    utterance.onerror = () => { setStatus(false); resetTextDisplay(); document.getElementById('voice-error').style.display = 'flex'; };
+    utterance.onstart = () => {
+      setStatus(true);
+      document.getElementById('voice-error').style.display = 'none';
+    };
+    utterance.onend = () => { setStatus(false); resetTextDisplay(); };
+    utterance.onerror = () => {
+      setStatus(false);
+      resetTextDisplay();
+      document.getElementById('voice-error').style.display = 'flex';
+    };
 
     window.speechSynthesis.speak(utterance);
   }
@@ -694,7 +762,7 @@
     const badge = document.getElementById('status-badge');
     const btn   = document.getElementById('btn-play');
     if (playing) {
-      badge.textContent = '読み上げ中';
+      badge.textContent = annotations.length > 0 ? '読み上げ中（ふりがな反映）' : '読み上げ中';
       badge.classList.add('playing');
       btn.innerHTML = '<i class="ti ti-player-play"></i> 読み上げ中…';
     } else {
@@ -706,16 +774,14 @@
 
   /* ---- 再挑戦 ---- */
   function retryTyping() {
-    stopSpeech();
-    resetStats();
+    stopSpeech(); resetStats();
     document.getElementById('typing-box').value = '';
     document.getElementById('typing-box').focus();
   }
 
   /* ---- 新しい問題 ---- */
   function newQuestion() {
-    stopSpeech();
-    resetStats();
+    stopSpeech(); resetStats(); clearAnnotations();
     currentText = '';
     document.getElementById('typing-box').value = '';
     document.getElementById('text-box').textContent = 'キーワードを入力して「生成」を押すと、練習文がここに表示されます。';
@@ -734,59 +800,46 @@
     if (finished || !startTime) return;
     finished = true;
     clearInterval(timerInterval);
-
     const elapsed = Math.floor((Date.now() - startTime) / 1000);
     const typed = document.getElementById('typing-box').value;
     const chars = typed.length;
-    const rate = currentText.length > 0
-      ? calcInclusion(typed, currentText) + '%'
-      : '—';
+    const rate = currentText.length > 0 ? calcInclusion(typed, currentText) + '%' : '—';
     const wpm = elapsed > 0 ? Math.round(chars / (elapsed / 60)) : 0;
-
     document.getElementById('stat-chars').textContent = chars;
     document.getElementById('stat-rate').textContent = rate;
     document.getElementById('stat-wpm').textContent = wpm;
     document.getElementById('stat-time').textContent = fmt(elapsed);
-
     ['s-chars', 's-rate', 's-wpm', 's-time'].forEach(id => {
       document.getElementById(id).classList.add('finished');
     });
-
     document.getElementById('btn-finish').disabled = true;
     document.getElementById('btn-finish').innerHTML = '<i class="ti ti-check"></i> 終了しました';
   }
 
   /* ---- タイマー・統計 ---- */
   function startTimer() {
-    finished = false;
-    startTime = Date.now();
+    finished = false; startTime = Date.now();
     timerInterval = setInterval(() => {
       if (finished) return;
       const elapsed = Math.floor((Date.now() - startTime) / 1000);
       document.getElementById('stat-time').textContent = fmt(elapsed);
       const typed = document.getElementById('typing-box').value;
       const len = typed.length;
-      if (len > 0 && elapsed > 0) {
+      if (len > 0 && elapsed > 0)
         document.getElementById('stat-wpm').textContent = Math.round(len / (elapsed / 60));
-      }
-      if (currentText.length > 0) {
-        document.getElementById('stat-rate').textContent =
-          calcInclusion(typed, currentText) + '%';
-      }
+      if (currentText.length > 0)
+        document.getElementById('stat-rate').textContent = calcInclusion(typed, currentText) + '%';
     }, 1000);
   }
 
   function resetStats() {
-    clearInterval(timerInterval);
-    startTime = null;
-    finished = false;
+    clearInterval(timerInterval); startTime = null; finished = false;
     document.getElementById('stat-chars').textContent = '0';
     document.getElementById('stat-rate').textContent = '—';
     document.getElementById('stat-wpm').textContent = '—';
     document.getElementById('stat-time').textContent = '0:00';
-    ['s-chars', 's-rate', 's-wpm', 's-time'].forEach(id => {
-      document.getElementById(id).classList.remove('finished');
-    });
+    ['s-chars', 's-rate', 's-wpm', 's-time'].forEach(id =>
+      document.getElementById(id).classList.remove('finished'));
     const finBtn = document.getElementById('btn-finish');
     finBtn.disabled = false;
     finBtn.innerHTML = '<i class="ti ti-check"></i> 入力終了';
@@ -797,13 +850,11 @@
     if (!startTime) startTimer();
     const typed = document.getElementById('typing-box').value;
     document.getElementById('stat-chars').textContent = typed.length;
-    if (currentText.length > 0) {
-      document.getElementById('stat-rate').textContent =
-        calcInclusion(typed, currentText) + '%';
-    }
+    if (currentText.length > 0)
+      document.getElementById('stat-rate').textContent = calcInclusion(typed, currentText) + '%';
   }
 
-  /* ---- 文字包含率: 入力した文字が問題文に何文字含まれるか（重複考慮） ---- */
+  /* ---- 文字包含率 ---- */
   function calcInclusion(typed, source) {
     if (!source.length) return 0;
     const srcMap = {};
@@ -821,11 +872,23 @@
     return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
   }
 
-  /* ---- Enter キーで入力終了 ---- */
+  /* ---- Enter で入力終了 ---- */
   document.getElementById('typing-box').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      finishTyping();
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); finishTyping(); }
+  });
+
+  /* ---- ポップアップのキーボード操作 ---- */
+  document.getElementById('furigana-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') confirmFurigana();
+    if (e.key === 'Escape') hideFuriganaPopup();
+  });
+
+  /* ---- ポップアップ外クリックで閉じる ---- */
+  document.addEventListener('mousedown', function(e) {
+    const popup = document.getElementById('furigana-popup');
+    if (popup.style.display === 'none') return;
+    if (!popup.contains(e.target) && !document.getElementById('text-box').contains(e.target)) {
+      hideFuriganaPopup();
     }
   });
 </script>
