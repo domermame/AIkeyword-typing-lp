@@ -225,6 +225,36 @@
       border-color: transparent;
     }
 
+    /* ---- Voice select ---- */
+    .voice-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 0.75rem;
+    }
+    .voice-row label {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      flex-shrink: 0;
+    }
+    #voice-select {
+      flex: 1;
+      padding: 6px 10px;
+      border-radius: var(--radius-md);
+      border: 0.5px solid var(--color-border-md);
+      background: var(--color-bg);
+      color: var(--color-text-primary);
+      font-size: 13px;
+      outline: none;
+      cursor: pointer;
+    }
+    #voice-select:focus { border-color: var(--color-teal); }
+    .voice-none {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      font-style: italic;
+    }
+
     /* ---- Speed buttons ---- */
     .speed-row {
       display: flex;
@@ -398,6 +428,15 @@
     <span class="status-badge" id="status-badge">待機中</span>
   </div>
 
+  <!-- Voice select -->
+  <div class="voice-row">
+    <label for="voice-select"><i class="ti ti-microphone" aria-hidden="true"></i> 音声</label>
+    <select id="voice-select" onchange="onVoiceChange()">
+      <option>読み込み中…</option>
+    </select>
+    <span class="voice-none" id="voice-none" style="display:none">日本語音声が見つかりません</span>
+  </div>
+
   <!-- Speed buttons -->
   <div class="speed-row">
     <span class="speed-label"><i class="ti ti-gauge" aria-hidden="true"></i> 読み上げ速度</span>
@@ -451,6 +490,38 @@
   let startTime = null;
   let timerInterval = null;
   let finished = false;
+  let jaVoices = [];
+
+  /* ---- 音声一覧の読み込み ---- */
+  function loadVoices() {
+    const all = window.speechSynthesis.getVoices();
+    jaVoices = all.filter(v => v.lang.startsWith('ja'));
+    const sel = document.getElementById('voice-select');
+    const none = document.getElementById('voice-none');
+    if (jaVoices.length === 0) {
+      sel.style.display = 'none';
+      none.style.display = 'inline';
+      return;
+    }
+    sel.style.display = '';
+    none.style.display = 'none';
+    sel.innerHTML = '';
+    jaVoices.forEach((v, i) => {
+      const opt = document.createElement('option');
+      opt.value = i;
+      // ☁ マークでネットワーク音声（高品質）を区別
+      opt.textContent = v.name + (v.localService ? '' : ' ☁');
+      sel.appendChild(opt);
+    });
+  }
+
+  function onVoiceChange() {
+    // 読み上げ中なら新しい音声で即再スタート
+    if (window.speechSynthesis.speaking) startSpeech();
+  }
+
+  speechSynthesis.onvoiceschanged = loadVoices;
+  loadVoices();
 
   /* ---- Wikipedia API ---- */
   async function generateText() {
@@ -576,6 +647,8 @@
     const utterance = new SpeechSynthesisUtterance(currentText);
     utterance.lang = 'ja-JP';
     utterance.rate = currentRate;
+    const voiceIdx = parseInt(document.getElementById('voice-select').value);
+    if (jaVoices[voiceIdx]) utterance.voice = jaVoices[voiceIdx];
 
     utterance.onboundary = (e) => {
       if (e.name === 'word' || e.name === 'sentence') {
