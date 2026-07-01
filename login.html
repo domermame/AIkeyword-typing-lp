@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ログイン — キーワードタイピング練習アプリ</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --color-bg: #ffffff;
+      --color-bg-secondary: #f5f4f0;
+      --color-text-primary: #1a1a18;
+      --color-text-secondary: #5f5e5a;
+      --color-border: rgba(0,0,0,0.12);
+      --color-border-md: rgba(0,0,0,0.22);
+      --color-purple-bg: #eeedfe;
+      --color-purple: #534ab7;
+      --color-error-bg: #fef2f2;
+      --color-error-border: #fca5a5;
+      --color-error-text: #dc2626;
+      --radius-md: 8px;
+      --radius-lg: 14px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-bg: #1c1c1a;
+        --color-bg-secondary: #252523;
+        --color-text-primary: #f0ede8;
+        --color-text-secondary: #b4b2a9;
+        --color-border: rgba(255,255,255,0.12);
+        --color-border-md: rgba(255,255,255,0.22);
+        --color-purple-bg: #26215c;
+        --color-purple: #afa9ec;
+        --color-error-bg: #2d0a0a;
+        --color-error-border: #7f1d1d;
+        --color-error-text: #fca5a5;
+      }
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", sans-serif;
+      background: var(--color-bg-secondary);
+      color: var(--color-text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      gap: 1.25rem;
+    }
+
+    /* ─── カード ─── */
+    .login-card {
+      background: var(--color-bg);
+      border-radius: var(--radius-lg);
+      border: 0.5px solid var(--color-border);
+      padding: 2rem 2rem 1.75rem;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 4px 28px rgba(0,0,0,0.07);
+    }
+
+    /* ─── タイトル ─── */
+    .app-title {
+      text-align: center;
+      margin-bottom: 1.75rem;
+    }
+    .app-title .icon {
+      font-size: 2rem;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .app-title h1 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      margin-bottom: 4px;
+    }
+    .app-title p {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+    }
+
+    /* ─── タブ ─── */
+    .tab-row {
+      display: flex;
+      background: var(--color-bg-secondary);
+      border-radius: var(--radius-md);
+      padding: 3px;
+      margin-bottom: 1.4rem;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      background: transparent;
+      border-radius: calc(var(--radius-md) - 2px);
+      font-size: 13.5px;
+      font-family: inherit;
+      cursor: pointer;
+      color: var(--color-text-secondary);
+      transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+    }
+    .tab-btn.active {
+      background: var(--color-bg);
+      color: var(--color-text-primary);
+      font-weight: 500;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+
+    /* ─── フォーム ─── */
+    .form-group { margin-bottom: 0.9rem; }
+    .form-label {
+      display: block;
+      font-size: 12.5px;
+      color: var(--color-text-secondary);
+      margin-bottom: 5px;
+    }
+    .form-input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      border: 0.5px solid var(--color-border-md);
+      background: var(--color-bg);
+      color: var(--color-text-primary);
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .form-input:focus {
+      border-color: var(--color-purple);
+    }
+    .form-input::placeholder { color: var(--color-text-secondary); opacity: 0.6; }
+
+    /* ─── エラー ─── */
+    .error-msg {
+      display: none;
+      background: var(--color-error-bg);
+      border: 0.5px solid var(--color-error-border);
+      border-radius: var(--radius-md);
+      padding: 9px 12px;
+      font-size: 13px;
+      color: var(--color-error-text);
+      margin-bottom: 1rem;
+      line-height: 1.45;
+    }
+
+    /* ─── 送信ボタン ─── */
+    .btn-submit {
+      width: 100%;
+      padding: 11px;
+      background: var(--color-purple);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 15px;
+      font-family: inherit;
+      font-weight: 500;
+      cursor: pointer;
+      margin-bottom: 1rem;
+      transition: opacity 0.15s;
+    }
+    .btn-submit:hover:not(:disabled) { opacity: 0.88; }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ─── 区切り ─── */
+    .or-divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 1rem;
+    }
+    .or-divider::before, .or-divider::after {
+      content: '';
+      flex: 1;
+      height: 0.5px;
+      background: var(--color-border);
+    }
+    .or-divider span { font-size: 12px; color: var(--color-text-secondary); }
+
+    /* ─── Google ボタン ─── */
+    .btn-google {
+      width: 100%;
+      padding: 10px;
+      background: transparent;
+      border: 0.5px solid var(--color-border-md);
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      color: var(--color-text-primary);
+      transition: background 0.15s;
+    }
+    .btn-google:hover { background: var(--color-bg-secondary); }
+    .btn-google svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+    /* ─── 戻るリンク ─── */
+    .back-link {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+    }
+    .back-link a {
+      color: var(--color-purple);
+      text-decoration: none;
+    }
+    .back-link a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<div class="login-card">
+  <div class="app-title">
+    <div class="icon">⌨️</div>
+    <h1>キーワードタイピング練習</h1>
+    <p>ログインして練習記録を保存しましょう</p>
+  </div>
+
+  <!-- タブ -->
+  <div class="tab-row">
+    <button class="tab-btn active" id="tab-login"    onclick="switchTab('login')">ログイン</button>
+    <button class="tab-btn"        id="tab-register" onclick="switchTab('register')">新規登録</button>
+  </div>
+
+  <!-- エラー -->
+  <div class="error-msg" id="error-msg"></div>
+
+  <!-- 入力欄 -->
+  <div class="form-group">
+    <label class="form-label" for="email">メールアドレス</label>
+    <input type="email" id="email" class="form-input"
+           placeholder="example@gmail.com" autocomplete="email" />
+  </div>
+  <div class="form-group">
+    <label class="form-label" for="password">パスワード</label>
+    <input type="password" id="password" class="form-input"
+           placeholder="6文字以上" autocomplete="current-password" />
+  </div>
+
+  <!-- 送信 -->
+  <button class="btn-submit" id="btn-submit" onclick="handleSubmit()">ログイン</button>
+
+  <!-- Google -->
+  <div class="or-divider"><span>または</span></div>
+  <button class="btn-google" onclick="handleGoogle()">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+    </svg>
+    Google でログイン
+  </button>
+</div>
+
+<p class="back-link"><a href="index.html">← トップページに戻る</a></p>
+
+<script type="module">
+  import { initializeApp }
+    from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import {
+    getAuth,
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    signInWithPopup,
+    GoogleAuthProvider,
+    onAuthStateChanged
+  } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+
+  /* ── Firebase 初期化 ── */
+  const firebaseConfig = {
+    apiKey:            "AIzaSyCQhPn3c-dGy-MgaJQQwdEKhRX-9u4-XOs",
+    authDomain:        "keyword-voice-typing-app.firebaseapp.com",
+    projectId:         "keyword-voice-typing-app",
+    storageBucket:     "keyword-voice-typing-app.firebasestorage.app",
+    messagingSenderId: "1080528515023",
+    appId:             "1:1080528515023:web:31964beabb70e5de35ecba"
+  };
+
+  const app      = initializeApp(firebaseConfig);
+  const auth     = getAuth(app);
+  const gProvider = new GoogleAuthProvider();
+
+  /* ── すでにログイン済みならリダイレクト ── */
+  onAuthStateChanged(auth, user => {
+    if (user) window.location.href = 'app-keyboard.html';
+  });
+
+  /* ── タブ切り替え ── */
+  let currentMode = 'login';
+
+  window.switchTab = function(mode) {
+    currentMode = mode;
+    document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+    document.getElementById('tab-register').classList.toggle('active', mode === 'register');
+    document.getElementById('btn-submit').textContent =
+      mode === 'login' ? 'ログイン' : 'アカウントを作成';
+    hideError();
+  };
+
+  /* ── メール/パスワード ── */
+  window.handleSubmit = async function() {
+    const email    = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const btn      = document.getElementById('btn-submit');
+
+    if (!email || !password) {
+      showError('メールアドレスとパスワードを入力してください。');
+      return;
+    }
+    if (currentMode === 'register' && password.length < 6) {
+      showError('パスワードは6文字以上で設定してください。');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = '処理中…';
+    hideError();
+
+    try {
+      if (currentMode === 'login') {
+        await signInWithEmailAndPassword(auth, email, password);
+      } else {
+        await createUserWithEmailAndPassword(auth, email, password);
+      }
+      // onAuthStateChanged がリダイレクトする
+    } catch (e) {
+      showError(translateError(e.code));
+    } finally {
+      btn.disabled = false;
+      btn.textContent = currentMode === 'login' ? 'ログイン' : 'アカウントを作成';
+    }
+  };
+
+  /* ── Google ログイン ── */
+  window.handleGoogle = async function() {
+    hideError();
+    try {
+      await signInWithPopup(auth, gProvider);
+      // onAuthStateChanged がリダイレクトする
+    } catch (e) {
+      if (e.code !== 'auth/popup-closed-by-user') {
+        showError(translateError(e.code));
+      }
+    }
+  };
+
+  /* ── ヘルパー ── */
+  function showError(msg) {
+    const el = document.getElementById('error-msg');
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+  function hideError() {
+    document.getElementById('error-msg').style.display = 'none';
+  }
+
+  function translateError(code) {
+    const map = {
+      'auth/user-not-found':          'このメールアドレスは登録されていません。',
+      'auth/wrong-password':          'パスワードが正しくありません。',
+      'auth/invalid-credential':      'メールアドレスまたはパスワードが正しくありません。',
+      'auth/email-already-in-use':    'このメールアドレスはすでに使用されています。',
+      'auth/invalid-email':           'メールアドレスの形式が正しくありません。',
+      'auth/weak-password':           'パスワードは6文字以上にしてください。',
+      'auth/too-many-requests':       'ログイン試行回数が多すぎます。しばらく待ってから再試行してください。',
+      'auth/network-request-failed':  'ネットワークエラーが発生しました。接続を確認してください。',
+      'auth/popup-blocked':           'ポップアップがブロックされました。ブラウザの設定を確認してください。',
+      'auth/operation-not-allowed':   'この認証方法は有効になっていません。Firebase コンソールで設定してください。',
+      'auth/unauthorized-domain':     'このドメインは Firebase で許可されていません。Firebase コンソールの「承認済みドメイン」に追加してください。',
+    };
+    return map[code] ?? `エラーが発生しました（${code}）。もう一度お試しください。`;
+  }
+
+  /* ── キーボード操作 ── */
+  document.getElementById('email').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('password').focus();
+  });
+  document.getElementById('password').addEventListener('keydown', e => {
+    if (e.key === 'Enter') window.handleSubmit();
+  });
+</script>
+
+</body>
+</html>
