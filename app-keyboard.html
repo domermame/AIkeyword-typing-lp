@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>キーワードタイピング練習 — アプリ</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --color-bg: #ffffff;
+      --color-bg-secondary: #f5f4f0;
+      --color-bg-info: #e6f1fb;
+      --color-text-primary: #1a1a18;
+      --color-text-secondary: #5f5e5a;
+      --color-border: rgba(0,0,0,0.12);
+      --color-border-md: rgba(0,0,0,0.22);
+      --color-purple-bg: #eeedfe;
+      --color-purple: #534ab7;
+      --color-purple-text: #3c3489;
+      --color-teal-bg: #e1f5ee;
+      --color-teal: #0f6e56;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-bg: #1c1c1a;
+        --color-bg-secondary: #252523;
+        --color-bg-info: #042c53;
+        --color-text-primary: #f0ede8;
+        --color-text-secondary: #b4b2a9;
+        --color-border: rgba(255,255,255,0.12);
+        --color-border-md: rgba(255,255,255,0.22);
+        --color-purple-bg: #26215c;
+        --color-purple: #afa9ec;
+        --color-purple-text: #cecbf6;
+        --color-teal-bg: #04342c;
+        --color-teal: #5dcaa5;
+      }
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--color-bg-secondary);
+      color: var(--color-text-primary);
+      font-size: 16px;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    /* ── ローディング画面 ── */
+    #auth-loading {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: var(--color-text-secondary);
+    }
+
+    #app-body { display: none; }
+
+    /* ── ヘッダー ── */
+    .app-header {
+      background: var(--color-bg);
+      border-bottom: 0.5px solid var(--color-border);
+      padding: 0 1.25rem;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .app-header-title {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      flex: 1;
+    }
+    .app-header-title a {
+      text-decoration: none;
+      color: var(--color-text-primary);
+    }
+    .user-email {
+      font-size: 12.5px;
+      color: var(--color-text-secondary);
+      max-width: 160px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .btn-logout {
+      padding: 6px 14px;
+      border: 0.5px solid var(--color-border-md);
+      border-radius: var(--radius-md);
+      background: transparent;
+      color: var(--color-text-secondary);
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn-logout:hover { background: var(--color-bg-secondary); }
+
+    /* ── メインレイアウト ── */
+    .container { max-width: 720px; margin: 0 auto; padding: 1.5rem 1.25rem 3rem; }
+
+    /* ── 練習ボックス ── */
+    .practice-box {
+      background: var(--color-bg);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      border: 0.5px solid var(--color-border);
+      margin-bottom: 1.5rem;
+    }
+    .box-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-text-secondary);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .box-title i { color: var(--color-purple); }
+
+    .demo-input-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 1rem;
+    }
+    .demo-input-row input {
+      flex: 1;
+      padding: 9px 12px;
+      border-radius: var(--radius-md);
+      border: 0.5px solid var(--color-border-md);
+      background: var(--color-bg-secondary);
+      color: var(--color-text-primary);
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+    }
+    .demo-input-row input:focus { border-color: var(--color-purple); }
+    .demo-input-row button {
+      padding: 9px 18px;
+      background: var(--color-purple);
+      color: var(--color-purple-bg);
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .demo-input-row button:hover { opacity: 0.88; }
+    #btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ── カスタムテキスト ── */
+    .or-row { display: flex; align-items: center; gap: 10px; margin-bottom: 0.75rem; }
+    .or-line { flex: 1; height: 0.5px; background: var(--color-border); }
+    .or-text { font-size: 12px; color: var(--color-text-secondary); white-space: nowrap; }
+    .custom-toggle {
+      background: none; border: none; color: var(--color-purple);
+      font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 4px;
+      text-decoration: underline; text-underline-offset: 2px; padding: 0; font-family: inherit;
+    }
+    .custom-toggle:hover { opacity: 0.75; }
+    .custom-section {
+      background: var(--color-bg-secondary);
+      border: 0.5px solid var(--color-border);
+      border-radius: var(--radius-md); padding: 0.75rem; margin-bottom: 0.75rem;
+    }
+    .custom-textarea {
+      width: 100%; padding: 8px 10px; border-radius: var(--radius-md);
+      border: 0.5px solid var(--color-border-md);
+      background: var(--color-bg); color: var(--color-text-primary);
+      font-size: 14px; font-family: inherit; line-height: 1.7;
+      resize: vertical; outline: none; margin-bottom: 0.4rem; min-height: 70px;
+    }
+    .custom-textarea:focus { border-color: var(--color-purple); }
+    .custom-footer { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .char-counter { font-size: 12px; color: var(--color-text-secondary); }
+    .char-counter.over { color: #dc2626; font-weight: 500; }
+    .custom-warning { font-size: 12px; color: #dc2626; }
+    .btn-use-custom {
+      margin-left: auto; padding: 7px 14px; background: var(--color-purple);
+      color: var(--color-purple-bg); border: none; border-radius: var(--radius-md);
+      font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 4px;
+      font-family: inherit;
+    }
+    .btn-use-custom:hover { opacity: 0.88; }
+    .btn-use-custom:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── 問題文 ── */
+    .demo-error {
+      display: none;
+      background: var(--color-bg-secondary);
+      border: 0.5px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      margin-bottom: 0.75rem;
+    }
+    .demo-text {
+      font-size: 15px;
+      line-height: 2;
+      margin-bottom: 1rem;
+      min-height: 4em;
+      letter-spacing: 0.02em;
+    }
+    .char-pending { color: var(--color-text-secondary); }
+    .char-correct { color: #ffffff; background: var(--color-purple); border-radius: 2px; }
+    .char-wrong   { color: var(--color-text-secondary); }
+    .char-current { color: var(--color-text-secondary); }
+
+    .wiki-credit {
+      font-size: 11px; color: var(--color-text-secondary);
+      text-align: right; margin-bottom: 0.5rem;
+    }
+    .wiki-credit a { color: var(--color-text-secondary); }
+
+    /* ── 完了バナー ── */
+    .demo-result {
+      display: none;
+      background: var(--color-purple-bg);
+      border: 0.5px solid var(--color-purple);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      font-size: 13px;
+      color: var(--color-purple);
+      margin-bottom: 1rem;
+      text-align: center;
+      font-weight: 500;
+    }
+    .save-status {
+      display: none;
+      font-size: 12px;
+      color: var(--color-teal);
+      text-align: center;
+      margin-top: 4px;
+    }
+
+    /* ── 入力欄 ── */
+    #typing-box {
+      width: 100%;
+      padding: 10px 12px;
+      margin-bottom: 1rem;
+      border-radius: var(--radius-md);
+      border: 0.5px solid var(--color-border-md);
+      background: var(--color-bg-secondary);
+      color: var(--color-text-primary);
+      font-size: 14px;
+      font-family: inherit;
+      line-height: 1.7;
+      resize: none;
+      outline: none;
+    }
+    #typing-box:focus { border-color: var(--color-purple); }
+
+    /* ── 統計 ── */
+    .demo-stats { display: flex; gap: 12px; }
+    .demo-stat {
+      flex: 1;
+      background: var(--color-bg-secondary);
+      border-radius: var(--radius-md);
+      padding: 10px;
+      text-align: center;
+      border: 0.5px solid var(--color-border);
+    }
+    .demo-stat .val { font-size: 20px; font-weight: 500; }
+    .demo-stat .lbl { font-size: 11px; color: var(--color-text-secondary); }
+
+    /* ── ボタン ── */
+    .demo-buttons {
+      display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;
+    }
+    .demo-btn {
+      flex: 1;
+      padding: 9px 8px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      cursor: pointer;
+      border: 0.5px solid var(--color-border-md);
+      background: transparent;
+      color: var(--color-text-primary);
+      min-width: 80px;
+      font-family: inherit;
+    }
+    .demo-btn:hover { background: var(--color-bg-secondary); }
+    .demo-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .demo-btn-pause.resuming {
+      border-color: var(--color-purple);
+      color: var(--color-purple);
+    }
+
+    /* ── 履歴セクション ── */
+    .history-box {
+      background: var(--color-bg);
+      border-radius: var(--radius-lg);
+      border: 0.5px solid var(--color-border);
+      overflow: hidden;
+    }
+    .history-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 0.5px solid var(--color-border);
+      font-size: 13px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .history-header i { color: var(--color-purple); }
+    .history-empty {
+      padding: 2rem 1.25rem;
+      text-align: center;
+      font-size: 13px;
+      color: var(--color-text-secondary);
+    }
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .history-table th {
+      padding: 8px 12px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--color-text-secondary);
+      border-bottom: 0.5px solid var(--color-border);
+      background: var(--color-bg-secondary);
+    }
+    .history-table td {
+      padding: 10px 12px;
+      border-bottom: 0.5px solid var(--color-border);
+      vertical-align: middle;
+    }
+    .history-table tr:last-child td { border-bottom: none; }
+    .history-table tr:hover td { background: var(--color-bg-secondary); }
+    .history-keyword {
+      max-width: 140px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .history-date { color: var(--color-text-secondary); white-space: nowrap; }
+    .history-num { text-align: right; font-variant-numeric: tabular-nums; }
+    .history-cpm { font-weight: 500; color: var(--color-purple); }
+  </style>
+</head>
+<body>
+
+<!-- ログイン確認中 -->
+<div id="auth-loading">読み込み中…</div>
+
+<!-- アプリ本体 -->
+<div id="app-body">
+
+  <header class="app-header">
+    <div class="app-header-title">
+      <a href="index.html">⌨ キーワードタイピング練習</a>
+    </div>
+    <span class="user-email" id="user-email"></span>
+    <button class="btn-logout" onclick="handleLogout()">ログアウト</button>
+  </header>
+
+  <div class="container">
+
+    <!-- ── 練習エリア ── -->
+    <div class="practice-box">
+      <div class="box-title">
+        <i class="ti ti-keyboard"></i> キーボード入力練習
+      </div>
+
+      <div class="demo-input-row">
+        <input type="text" id="kw-input"
+               placeholder="キーワードを入力（例：要約筆記、人工知能…）"
+               onkeydown="if(event.key==='Enter')generateDemo()" />
+        <button id="btn-generate" onclick="generateDemo()">生成</button>
+      </div>
+
+      <div class="demo-error" id="demo-error"></div>
+
+      <!-- 自分の文章 -->
+      <div class="or-row">
+        <div class="or-line"></div>
+        <span class="or-text">または</span>
+        <button class="custom-toggle" onclick="toggleCustomSection()">
+          自分の文章を使う <i class="ti ti-chevron-down" id="custom-toggle-icon"></i>
+        </button>
+        <div class="or-line"></div>
+      </div>
+      <div class="custom-section" id="custom-section" style="display:none">
+        <textarea class="custom-textarea" id="custom-text-input"
+          placeholder="練習したい文章をここに貼り付けてください（200文字以内）"
+          oninput="updateCustomCounter()"></textarea>
+        <div class="custom-footer">
+          <span class="char-counter" id="custom-counter">0 / 200</span>
+          <span class="custom-warning" id="custom-warning" style="display:none">200文字以内にしてください</span>
+          <button class="btn-use-custom" id="btn-use-custom" onclick="useCustomText()" disabled>
+            <i class="ti ti-check"></i> この文章を使う
+          </button>
+        </div>
+      </div>
+
+      <div class="demo-text" id="demo-text">
+        <span class="char-pending">キーワードを入力して「生成」を押してください。</span>
+      </div>
+      <div class="wiki-credit" id="wiki-credit" style="display:none"></div>
+      <div class="demo-result" id="demo-result"></div>
+      <div class="save-status" id="save-status"></div>
+
+      <textarea id="typing-box"
+        placeholder="ここに入力（生成後に入力できます）"
+        rows="3" disabled></textarea>
+
+      <div class="demo-stats">
+        <div class="demo-stat">
+          <div class="val" id="wpm-val">—</div>
+          <div class="lbl">文字/分</div>
+        </div>
+        <div class="demo-stat">
+          <div class="val" id="time-val">0:00</div>
+          <div class="lbl">経過時間</div>
+        </div>
+      </div>
+
+      <div class="demo-buttons">
+        <button class="demo-btn" id="btn-retry"  onclick="retryDemo()"   disabled>再挑戦</button>
+        <button class="demo-btn" id="btn-new"    onclick="newDemo()"     disabled>新しい問題</button>
+        <button class="demo-btn demo-btn-pause" id="btn-pause" onclick="togglePause()" disabled>一時停止</button>
+      </div>
+    </div>
+
+    <!-- ── 練習履歴 ── -->
+    <div class="history-box">
+      <div class="history-header">
+        <i class="ti ti-history"></i> 練習履歴（直近10件）
+      </div>
+      <div class="history-empty" id="history-empty">練習を完了すると記録が表示されます。</div>
+      <table class="history-table" id="history-table" style="display:none">
+        <thead>
+          <tr>
+            <th>キーワード</th>
+            <th>日時</th>
+            <th style="text-align:right">文字数</th>
+            <th style="text-align:right">文字/分</th>
+            <th style="text-align:right">時間</th>
+          </tr>
+        </thead>
+        <tbody id="history-body"></tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp }
+    from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getAuth, onAuthStateChanged, signOut }
+    from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+  import {
+    getFirestore, collection, addDoc, query,
+    orderBy, limit, getDocs, serverTimestamp
+  } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+  /* ── Firebase 初期化 ── */
+  const firebaseConfig = {
+    apiKey:            "AIzaSyCQhPn3c-dGy-MgaJQQwdEKhRX-9u4-XOs",
+    authDomain:        "keyword-voice-typing-app.firebaseapp.com",
+    projectId:         "keyword-voice-typing-app",
+    storageBucket:     "keyword-voice-typing-app.firebasestorage.app",
+    messagingSenderId: "1080528515023",
+    appId:             "1:1080528515023:web:31964beabb70e5de35ecba"
+  };
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  let currentUser = null;
+
+  /* ── 認証チェック ── */
+  onAuthStateChanged(auth, user => {
+    if (!user) {
+      window.location.href = 'login.html';
+      return;
+    }
+    currentUser = user;
+    document.getElementById('user-email').textContent = user.email || user.displayName || '';
+    document.getElementById('auth-loading').style.display = 'none';
+    document.getElementById('app-body').style.display = 'block';
+    loadHistory();
+  });
+
+  /* ── ログアウト ── */
+  window.handleLogout = async function() {
+    await signOut(auth);
+    window.location.href = 'login.html';
+  };
+
+  /* ────────── タイピング練習ロジック ────────── */
+
+  let currentText  = '';
+  let currentKw    = '';
+  let timerInterval = null;
+  let startTime    = null;
+  let pausedElapsed = 0;
+  let finished     = false;
+  let paused       = false;
+
+  window.generateDemo = async function() {
+    const kw = document.getElementById('kw-input').value.trim();
+    if (!kw) return;
+
+    const btn    = document.getElementById('btn-generate');
+    const errBox = document.getElementById('demo-error');
+    const credit = document.getElementById('wiki-credit');
+
+    btn.textContent = '取得中…';
+    btn.disabled = true;
+    errBox.style.display = 'none';
+    credit.style.display = 'none';
+    document.getElementById('demo-text').innerHTML =
+      '<span class="char-pending">Wikipediaから記事を取得しています…</span>';
+
+    try {
+      const result = await fetchWikipedia(kw);
+      currentText = result.text;
+      currentKw   = kw;
+      const note = result.redirected
+        ? '「' + kw + '」→「' + result.title + '」にリダイレクト&ensp;|&ensp;' : '';
+      credit.innerHTML = note + '出典: <a href="https://ja.wikipedia.org/wiki/'
+        + encodeURIComponent(result.title)
+        + '" target="_blank" rel="noopener">Wikipedia「' + result.title + '」</a>';
+      credit.style.display = 'block';
+      startPractice();
+    } catch (e) {
+      errBox.textContent = e.message;
+      errBox.style.display = 'block';
+      document.getElementById('demo-text').innerHTML =
+        '<span class="char-pending">キーワードを入力して「生成」を押してください。</span>';
+    } finally {
+      btn.textContent = '生成';
+      btn.disabled = false;
+    }
+  };
+
+  async function fetchWikipedia(keyword) {
+    const result = await fetchPage(keyword);
+    if (!result) throw new Error('「' + keyword + '」の文章が取得できませんでした。別のキーワードを試してください。');
+    return result;
+  }
+
+  async function fetchPage(title) {
+    const url = 'https://ja.wikipedia.org/w/api.php?action=query'
+      + '&titles=' + encodeURIComponent(title)
+      + '&prop=extracts&exintro=true&exsentences=4&redirects=1&format=json&origin=*';
+
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('ネットワークエラーが発生しました。');
+
+    const data = await res.json();
+    const page = Object.values(data.query.pages)[0];
+    if (page.missing !== undefined) return null;
+
+    const redirected = page.title !== title;
+    const div = document.createElement('div');
+    div.innerHTML = page.extract;
+    let text = (div.textContent || '').replace(/\s+/g, ' ').trim();
+
+    text = text.replace(/（[^）]{0,20}[：:][^）]*）/g, '');
+    text = text.replace(/\(/g, '（').replace(/\)/g, '）');
+    text = text.replace(/!/g, '！').replace(/\?/g, '？');
+    text = text.replace(/([^\x00-\x7F])\s+([^\x00-\x7F])/g, '$1$2');
+    text = text.replace(/\s+/g, ' ').trim();
+
+    if (text.replace(/[。、\s]/g, '').length < 15) return null;
+
+    if (text.length > 250) {
+      const cut = text.indexOf('。', 100);
+      text = cut !== -1 && cut < 280 ? text.slice(0, cut + 1) : text.slice(0, 200) + '。';
+    }
+    if (!text.endsWith('。')) text += '。';
+
+    return { text, title: page.title, redirected };
+  }
+
+  function startPractice() {
+    renderChars('');
+    resetTimer();
+    finished = false;
+    paused   = false;
+
+    const box = document.getElementById('typing-box');
+    box.value = '';
+    box.disabled = false;
+    box.placeholder = 'ここに入力';
+    box.focus();
+
+    document.getElementById('demo-result').style.display = 'none';
+    document.getElementById('save-status').style.display = 'none';
+    document.getElementById('wpm-val').textContent = '—';
+    setButtonState(true);
+    resetPauseBtn();
+  }
+
+  function renderChars(typed) {
+    const dt = document.getElementById('demo-text');
+    dt.innerHTML = '';
+    for (let i = 0; i < currentText.length; i++) {
+      const span = document.createElement('span');
+      span.textContent = currentText[i];
+      if (i < typed.length) {
+        span.className = typed[i] === currentText[i] ? 'char-correct' : 'char-wrong';
+      } else if (i === typed.length) {
+        span.className = 'char-current';
+      } else {
+        span.className = 'char-pending';
+      }
+      dt.appendChild(span);
+    }
+  }
+
+  function onTyping() {
+    if (finished || paused) return;
+    const typed = document.getElementById('typing-box').value;
+    if (typed.length === 1 && !startTime) startTimer();
+    renderChars(typed);
+    if (typed === currentText) stopTimer(typed.length);
+  }
+
+  function startTimer() {
+    startTime = Date.now() - pausedElapsed * 1000;
+    timerInterval = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      document.getElementById('time-val').textContent = fmt(elapsed);
+      const typed = document.getElementById('typing-box').value;
+      if (typed.length > 0 && elapsed > 0) {
+        document.getElementById('wpm-val').textContent =
+          Math.round(typed.length / (elapsed / 60));
+      }
+    }, 500);
+  }
+
+  function stopTimer(typedLen) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    finished = true;
+
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    document.getElementById('time-val').textContent = fmt(elapsed);
+    const cpm = elapsed > 0 ? Math.round(typedLen / (elapsed / 60)) : 0;
+    document.getElementById('wpm-val').textContent = cpm;
+
+    const result = document.getElementById('demo-result');
+    result.textContent = `完了！ ${fmt(elapsed)} で ${typedLen} 文字入力しました。`;
+    result.style.display = 'block';
+    document.getElementById('typing-box').disabled = true;
+    document.getElementById('btn-pause').disabled = true;
+
+    saveRecord(currentKw || '自分の文章', currentText, typedLen, elapsed, cpm);
+  }
+
+  function resetTimer() {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    startTime     = null;
+    pausedElapsed = 0;
+    document.getElementById('time-val').textContent = '0:00';
+  }
+
+  window.retryDemo = function() { if (currentText) startPractice(); };
+
+  window.newDemo = function() {
+    resetTimer();
+    finished = false;
+    paused   = false;
+    currentText = '';
+    currentKw   = '';
+    document.getElementById('demo-text').innerHTML =
+      '<span class="char-pending">キーワードを入力して「生成」を押してください。</span>';
+    const box = document.getElementById('typing-box');
+    box.value = '';
+    box.disabled = true;
+    box.placeholder = 'ここに入力（生成後に入力できます）';
+    document.getElementById('demo-result').style.display = 'none';
+    document.getElementById('save-status').style.display = 'none';
+    document.getElementById('wpm-val').textContent = '—';
+    document.getElementById('kw-input').value = '';
+    document.getElementById('kw-input').focus();
+    setButtonState(false);
+    document.getElementById('custom-text-input').value = '';
+    document.getElementById('custom-counter').textContent = '0 / 200';
+    document.getElementById('custom-counter').classList.remove('over');
+    document.getElementById('custom-warning').style.display = 'none';
+    document.getElementById('btn-use-custom').disabled = true;
+    document.getElementById('custom-section').style.display = 'none';
+    document.getElementById('custom-toggle-icon').className = 'ti ti-chevron-down';
+  };
+
+  window.togglePause = function() {
+    if (finished) return;
+    if (!paused) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      pausedElapsed = Math.floor((Date.now() - startTime) / 1000);
+      paused = true;
+      document.getElementById('typing-box').disabled = true;
+      const btn = document.getElementById('btn-pause');
+      btn.textContent = '再開';
+      btn.classList.add('resuming');
+    } else {
+      paused = false;
+      document.getElementById('typing-box').disabled = false;
+      document.getElementById('typing-box').focus();
+      startTimer();
+      const btn = document.getElementById('btn-pause');
+      btn.textContent = '一時停止';
+      btn.classList.remove('resuming');
+    }
+  };
+
+  function setButtonState(active) {
+    document.getElementById('btn-retry').disabled = !active;
+    document.getElementById('btn-new').disabled   = !active;
+    document.getElementById('btn-pause').disabled = !active;
+  }
+
+  function resetPauseBtn() {
+    const btn = document.getElementById('btn-pause');
+    btn.textContent = '一時停止';
+    btn.classList.remove('resuming');
+  }
+
+  function fmt(sec) {
+    return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
+  }
+
+  document.getElementById('typing-box').addEventListener('input', onTyping);
+
+  /* ── 自分の文章 ── */
+  const MAX_CUSTOM = 200;
+
+  window.toggleCustomSection = function() {
+    const section = document.getElementById('custom-section');
+    const icon    = document.getElementById('custom-toggle-icon');
+    const isOpen  = section.style.display !== 'none';
+    section.style.display = isOpen ? 'none' : 'block';
+    icon.className = isOpen ? 'ti ti-chevron-down' : 'ti ti-chevron-up';
+  };
+
+  window.updateCustomCounter = function() {
+    const len     = document.getElementById('custom-text-input').value.length;
+    const counter = document.getElementById('custom-counter');
+    const warning = document.getElementById('custom-warning');
+    counter.textContent = len + ' / ' + MAX_CUSTOM;
+    const over = len > MAX_CUSTOM;
+    counter.classList.toggle('over', over);
+    warning.style.display = over ? 'inline' : 'none';
+    document.getElementById('btn-use-custom').disabled = over || len === 0;
+  };
+
+  window.useCustomText = function() {
+    const text = document.getElementById('custom-text-input').value.trim();
+    if (!text || text.length > MAX_CUSTOM) return;
+    resetTimer();
+    finished = false;
+    paused   = false;
+    currentKw = '自分の文章';
+    document.getElementById('demo-error').style.display = 'none';
+    document.getElementById('wiki-credit').style.display = 'none';
+    currentText = text;
+    startPractice();
+    document.getElementById('custom-section').style.display = 'none';
+    document.getElementById('custom-toggle-icon').className = 'ti ti-chevron-down';
+  };
+
+  /* ────────── Firestore ────────── */
+
+  async function saveRecord(keyword, text, chars, elapsed, cpm) {
+    if (!currentUser) return;
+    const statusEl = document.getElementById('save-status');
+    statusEl.textContent = '記録を保存中…';
+    statusEl.style.display = 'block';
+    try {
+      const ref = collection(db, 'users', currentUser.uid, 'records');
+      await addDoc(ref, {
+        keyword,
+        text,
+        chars,
+        elapsed,
+        cpm,
+        createdAt: serverTimestamp()
+      });
+      statusEl.textContent = '✓ 記録を保存しました';
+      loadHistory();
+    } catch (e) {
+      statusEl.textContent = '保存に失敗しました（' + e.message + '）';
+    }
+  }
+
+  async function loadHistory() {
+    if (!currentUser) return;
+    try {
+      const ref = collection(db, 'users', currentUser.uid, 'records');
+      const q   = query(ref, orderBy('createdAt', 'desc'), limit(10));
+      const snap = await getDocs(q);
+
+      if (snap.empty) return;
+
+      const tbody = document.getElementById('history-body');
+      tbody.innerHTML = '';
+      snap.forEach(doc => {
+        const d = doc.data();
+        const date = d.createdAt?.toDate
+          ? d.createdAt.toDate().toLocaleString('ja-JP', {
+              month: '2-digit', day: '2-digit',
+              hour: '2-digit', minute: '2-digit'
+            })
+          : '—';
+        const elapsed = typeof d.elapsed === 'number'
+          ? Math.floor(d.elapsed / 60) + ':' + String(d.elapsed % 60).padStart(2, '0')
+          : '—';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="history-keyword" title="${escHtml(d.keyword)}">${escHtml(d.keyword)}</td>
+          <td class="history-date">${date}</td>
+          <td class="history-num">${d.chars ?? '—'}</td>
+          <td class="history-num history-cpm">${d.cpm ?? '—'}</td>
+          <td class="history-num">${elapsed}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('history-empty').style.display = 'none';
+      document.getElementById('history-table').style.display = 'table';
+    } catch (e) {
+      console.error('履歴の読み込みに失敗:', e);
+    }
+  }
+
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+</script>
+
+</body>
+</html>
