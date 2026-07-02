@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>音声読み上げ練習 — キーワードタイピング練習アプリ</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --color-bg: #ffffff;
+      --color-bg-secondary: #f5f4f0;
+      --color-bg-info: #e6f1fb;
+      --color-text-primary: #1a1a18;
+      --color-text-secondary: #5f5e5a;
+      --color-text-info: #185fa5;
+      --color-border: rgba(0,0,0,0.12);
+      --color-border-md: rgba(0,0,0,0.22);
+      --color-purple-bg: #eeedfe;
+      --color-purple: #534ab7;
+      --color-teal-bg: #e1f5ee;
+      --color-teal: #0f6e56;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-bg: #1c1c1a;
+        --color-bg-secondary: #252523;
+        --color-bg-info: #042c53;
+        --color-text-primary: #f0ede8;
+        --color-text-secondary: #b4b2a9;
+        --color-text-info: #85b7eb;
+        --color-border: rgba(255,255,255,0.12);
+        --color-border-md: rgba(255,255,255,0.22);
+        --color-purple-bg: #26215c;
+        --color-purple: #afa9ec;
+        --color-teal-bg: #04342c;
+        --color-teal: #5dcaa5;
+      }
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--color-bg-secondary);
+      color: var(--color-text-primary);
+      font-size: 16px;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    /* ── ローディング ── */
+    #auth-loading {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: var(--color-text-secondary);
+    }
+    #app-body { display: none; }
+
+    /* ── ヘッダー ── */
+    .app-header {
+      background: var(--color-bg);
+      border-bottom: 0.5px solid var(--color-border);
+      padding: 0 1.25rem;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .app-header-title {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+    }
+    .app-header-title a { text-decoration: none; color: var(--color-text-primary); }
+
+    /* ── ナビタブ ── */
+    .app-nav {
+      display: flex;
+      gap: 4px;
+      flex: 1;
+    }
+    .nav-tab {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      text-decoration: none;
+      color: var(--color-text-secondary);
+      transition: background 0.15s, color 0.15s;
+      white-space: nowrap;
+    }
+    .nav-tab:hover { background: var(--color-bg-secondary); color: var(--color-text-primary); }
+    .nav-tab.active {
+      background: var(--color-teal-bg);
+      color: var(--color-teal);
+      font-weight: 500;
+    }
+
+    .user-email {
+      font-size: 12.5px;
+      color: var(--color-text-secondary);
+      max-width: 160px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .btn-logout {
+      padding: 6px 14px;
+      border: 0.5px solid var(--color-border-md);
+      border-radius: var(--radius-md);
+      background: transparent;
+      color: var(--color-text-secondary);
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn-logout:hover { background: var(--color-bg-secondary); }
+
+    /* ── メインレイアウト ── */
+    .container { max-width: 680px; margin: 0 auto; padding: 1.5rem 1.25rem 3rem; }
+
+    /* ── 練習ボックス ── */
+    .practice-box {
+      background: var(--color-bg);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      border: 0.5px solid var(--color-border);
+      margin-bottom: 1.5rem;
+    }
+    .box-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-text-secondary);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .box-title i { color: var(--color-teal); }
+
+    /* ── ステップラベル ── */
+    .step-label {
+      font-size: 12px; color: var(--color-text-secondary);
+      margin-bottom: 6px; display: flex; align-items: center; gap: 6px;
+    }
+    .step-num {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--color-purple-bg); color: var(--color-purple);
+      font-size: 11px; font-weight: 500;
+      display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+
+    /* ── キーワード入力 ── */
+    .input-row { display: flex; gap: 8px; margin-bottom: 0.5rem; }
+    .input-row input {
+      flex: 1; padding: 10px 14px;
+      border-radius: var(--radius-md); border: 0.5px solid var(--color-border-md);
+      background: var(--color-bg-secondary); color: var(--color-text-primary);
+      font-size: 15px; font-family: inherit; outline: none;
+    }
+    .input-row input:focus { border-color: var(--color-purple); }
+    .btn-generate {
+      padding: 10px 20px; background: var(--color-purple); color: var(--color-purple-bg);
+      border: none; border-radius: var(--radius-md); font-size: 14px; font-family: inherit;
+      cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 6px;
+    }
+    .btn-generate:hover { opacity: 0.88; }
+    .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ── エラー・クレジット ── */
+    .demo-error {
+      display: none; background: var(--color-bg-secondary);
+      border: 0.5px solid var(--color-border); border-radius: var(--radius-md);
+      padding: 8px 12px; font-size: 13px; color: var(--color-text-secondary); margin-bottom: 1rem;
+    }
+    .wiki-credit {
+      display: none; font-size: 11px; color: var(--color-text-secondary);
+      text-align: right; margin-bottom: 0.75rem;
+    }
+    .wiki-credit a { color: var(--color-text-secondary); }
+
+    /* ── 問題文ボックス ── */
+    .text-box {
+      background: var(--color-bg-secondary); border: 0.5px solid var(--color-border);
+      border-radius: var(--radius-lg); padding: 1.25rem;
+      font-size: 15px; line-height: 2.2; margin-bottom: 0.5rem;
+      min-height: 6rem; color: var(--color-text-secondary);
+      cursor: text; user-select: text;
+    }
+    .text-box .spoken   { color: var(--color-text-secondary); opacity: 0.5; }
+    .text-box .speaking { background: var(--color-teal); color: #ffffff; border-radius: 3px; padding: 1px 2px; }
+    .text-box .unspoken { color: var(--color-text-primary); }
+
+    /* ── ルビ ── */
+    ruby { display: inline ruby; }
+    rt { font-size: 0.55em; color: var(--color-purple); letter-spacing: 0.02em; }
+    .annotated-text { border-bottom: 1.5px solid var(--color-purple); color: var(--color-text-primary); }
+
+    /* ── ふりがなヒント ── */
+    .furigana-hint { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 0.5rem; display: none; }
+    .furigana-hint.visible { display: block; }
+
+    /* ── ふりがなリスト ── */
+    .annotation-list {
+      display: none; background: var(--color-purple-bg);
+      border: 0.5px solid var(--color-border); border-radius: var(--radius-md);
+      padding: 8px 12px; margin-bottom: 1rem; font-size: 13px;
+    }
+    .ann-list-label { font-size: 11px; color: var(--color-purple); margin-bottom: 6px; display: flex; align-items: center; gap: 4px; }
+    .ann-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .ann-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: var(--color-bg); border: 0.5px solid var(--color-border-md);
+      border-radius: 20px; padding: 3px 10px; font-size: 12px; color: var(--color-text-primary);
+    }
+    .ann-arrow { color: var(--color-purple); font-weight: 500; }
+    .ann-remove {
+      background: none; border: none; cursor: pointer;
+      color: var(--color-text-secondary); font-size: 13px; padding: 0 2px; line-height: 1;
+    }
+    .ann-remove:hover { color: var(--color-text-primary); }
+
+    /* ── ふりがなポップアップ ── */
+    .furigana-popup {
+      position: fixed; background: var(--color-bg);
+      border: 0.5px solid var(--color-border-md); border-radius: var(--radius-lg);
+      padding: 12px 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+      z-index: 200; min-width: 260px; display: none;
+    }
+    .popup-label { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 8px; }
+    .popup-label strong { color: var(--color-text-primary); }
+    .popup-row { display: flex; gap: 6px; align-items: center; }
+    .popup-row input {
+      flex: 1; padding: 7px 10px;
+      border-radius: var(--radius-md); border: 0.5px solid var(--color-border-md);
+      background: var(--color-bg); color: var(--color-text-primary);
+      font-size: 14px; font-family: inherit; outline: none;
+    }
+    .popup-row input:focus { border-color: var(--color-purple); }
+    .popup-btn-ok {
+      padding: 7px 14px; background: var(--color-purple); color: var(--color-purple-bg);
+      border: none; border-radius: var(--radius-md); font-size: 13px; font-family: inherit; cursor: pointer;
+    }
+    .popup-btn-ok:hover { opacity: 0.88; }
+    .popup-btn-cancel {
+      padding: 7px 10px; background: transparent; color: var(--color-text-secondary);
+      border: 0.5px solid var(--color-border-md); border-radius: var(--radius-md);
+      font-size: 13px; font-family: inherit; cursor: pointer;
+    }
+    .popup-btn-cancel:hover { background: var(--color-bg-secondary); }
+
+    /* ── 音声コントロール ── */
+    .voice-controls { display: flex; gap: 10px; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; }
+    .btn-play {
+      display: flex; align-items: center; gap: 8px; padding: 10px 20px;
+      background: var(--color-teal); color: var(--color-teal-bg);
+      border: none; border-radius: var(--radius-md); font-size: 14px; font-family: inherit;
+      cursor: pointer; font-weight: 500;
+    }
+    .btn-play:hover { opacity: 0.88; }
+    .btn-play:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-stop {
+      display: flex; align-items: center; gap: 8px; padding: 10px 20px;
+      background: transparent; color: var(--color-text-secondary);
+      border: 0.5px solid var(--color-border-md); border-radius: var(--radius-md);
+      font-size: 14px; font-family: inherit; cursor: pointer;
+    }
+    .btn-stop:hover { background: var(--color-bg-secondary); }
+    .status-badge {
+      font-size: 12px; padding: 4px 10px; border-radius: var(--radius-md);
+      background: var(--color-bg-secondary); color: var(--color-text-secondary);
+      border: 0.5px solid var(--color-border);
+    }
+    .status-badge.playing { background: var(--color-teal-bg); color: var(--color-teal); border-color: transparent; }
+
+    /* ── 音声選択 ── */
+    .voice-row { display: flex; align-items: center; gap: 8px; margin-bottom: 0.5rem; }
+    .voice-row label { font-size: 13px; color: var(--color-text-secondary); flex-shrink: 0; }
+    #voice-select {
+      flex: 1; padding: 6px 10px; border-radius: var(--radius-md);
+      border: 0.5px solid var(--color-border-md);
+      background: var(--color-bg); color: var(--color-text-primary);
+      font-size: 13px; font-family: inherit; outline: none; cursor: pointer;
+    }
+    #voice-select:focus { border-color: var(--color-teal); }
+    .voice-none { font-size: 12px; color: var(--color-text-secondary); font-style: italic; }
+    .voice-hint { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 0.5rem; }
+    .voice-error {
+      font-size: 12px; color: #b45309; background: #fef3c7;
+      border: 0.5px solid #fcd34d; border-radius: var(--radius-md);
+      padding: 7px 12px; margin-bottom: 0.75rem;
+      display: flex; align-items: center; gap: 6px;
+    }
+    @media (prefers-color-scheme: dark) {
+      .voice-error { color: #fcd34d; background: #2d1f00; border-color: #78450a; }
+    }
+
+    /* ── 速度ボタン ── */
+    .speed-row { display: flex; align-items: center; gap: 8px; margin-bottom: 1.25rem; }
+    .speed-label { font-size: 13px; color: var(--color-text-secondary); flex-shrink: 0; }
+    .speed-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+    .speed-btn {
+      padding: 6px 14px; border-radius: var(--radius-md);
+      border: 0.5px solid var(--color-border-md);
+      background: transparent; color: var(--color-text-secondary);
+      font-size: 13px; font-family: inherit; cursor: pointer;
+    }
+    .speed-btn:hover { background: var(--color-bg-secondary); }
+    .speed-btn.active { background: var(--color-teal-bg); color: var(--color-teal); border-color: transparent; font-weight: 500; }
+
+    .divider { height: 0.5px; background: var(--color-border); margin: 1.25rem 0; }
+
+    /* ── 入力欄 ── */
+    #typing-box {
+      width: 100%; padding: 12px 14px; border-radius: var(--radius-md);
+      border: 0.5px solid var(--color-border-md);
+      background: var(--color-bg); color: var(--color-text-primary);
+      font-size: 15px; font-family: inherit; line-height: 1.7;
+      resize: none; outline: none; margin-bottom: 0.75rem;
+    }
+    #typing-box:focus { border-color: var(--color-purple); }
+
+    /* ── アクションボタン ── */
+    .action-row { display: flex; gap: 8px; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; }
+    .btn-retry, .btn-new {
+      display: flex; align-items: center; gap: 6px; padding: 9px 16px;
+      background: transparent; color: var(--color-text-secondary);
+      border: 0.5px solid var(--color-border-md); border-radius: var(--radius-md);
+      font-size: 14px; font-family: inherit; cursor: pointer;
+    }
+    .btn-retry:hover, .btn-new:hover { background: var(--color-bg-secondary); }
+    .btn-retry:disabled, .btn-new:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-finish {
+      display: flex; align-items: center; gap: 6px; padding: 9px 18px;
+      background: var(--color-purple); color: var(--color-purple-bg);
+      border: none; border-radius: var(--radius-md); font-size: 14px; font-family: inherit;
+      cursor: pointer; font-weight: 500; margin-left: auto;
+    }
+    .btn-finish:hover { opacity: 0.88; }
+    .btn-finish:disabled { opacity: 0.4; cursor: not-allowed; }
+    .hint-enter { font-size: 11px; color: var(--color-text-secondary); }
+
+    /* ── 統計 ── */
+    .stats { display: flex; gap: 10px; margin-bottom: 0.75rem; }
+    .stat {
+      flex: 1; background: var(--color-bg-secondary); border-radius: var(--radius-md);
+      padding: 10px 8px; text-align: center; border: 0.5px solid var(--color-border);
+    }
+    .stat .val { font-size: 20px; font-weight: 500; }
+    .stat .lbl { font-size: 10px; color: var(--color-text-secondary); margin-top: 2px; }
+    .stat.finished { border-color: var(--color-purple); background: var(--color-purple-bg); }
+    .stat.finished .val { color: var(--color-purple); }
+
+    /* ── 保存ステータス ── */
+    .save-status {
+      display: none; font-size: 12px; color: var(--color-teal);
+      text-align: center; margin-bottom: 0.5rem;
+    }
+
+    /* ── カスタムテキスト ── */
+    .or-row { display: flex; align-items: center; gap: 10px; margin: 0.6rem 0 0.5rem; }
+    .or-line { flex: 1; height: 0.5px; background: var(--color-border); }
+    .or-text { font-size: 12px; color: var(--color-text-secondary); white-space: nowrap; }
+    .custom-toggle {
+      background: none; border: none; color: var(--color-purple);
+      font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 4px;
+      text-decoration: underline; text-underline-offset: 2px; padding: 0; font-family: inherit;
+    }
+    .custom-toggle:hover { opacity: 0.75; }
+    .custom-section {
+      background: var(--color-bg-secondary); border: 0.5px solid var(--color-border);
+      border-radius: var(--radius-lg); padding: 1rem; margin-bottom: 1rem;
+    }
+    .custom-textarea {
+      width: 100%; padding: 10px 12px; border-radius: var(--radius-md);
+      border: 0.5px solid var(--color-border-md);
+      background: var(--color-bg); color: var(--color-text-primary);
+      font-size: 14px; font-family: inherit; line-height: 1.7;
+      resize: vertical; outline: none; margin-bottom: 0.5rem; min-height: 80px;
+    }
+    .custom-textarea:focus { border-color: var(--color-purple); }
+    .custom-footer { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .char-counter { font-size: 12px; color: var(--color-text-secondary); }
+    .char-counter.over { color: #dc2626; font-weight: 500; }
+    .custom-warning { font-size: 12px; color: #dc2626; }
+    .btn-use-custom {
+      margin-left: auto; padding: 8px 16px; background: var(--color-purple);
+      color: var(--color-purple-bg); border: none; border-radius: var(--radius-md);
+      font-size: 13px; font-family: inherit; cursor: pointer; display: flex; align-items: center; gap: 5px;
+    }
+    .btn-use-custom:hover { opacity: 0.88; }
+    .btn-use-custom:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── 履歴 ── */
+    .history-box {
+      background: var(--color-bg);
+      border-radius: var(--radius-lg);
+      border: 0.5px solid var(--color-border);
+      overflow: hidden;
+    }
+    .history-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 0.5px solid var(--color-border);
+      font-size: 13px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .history-header i { color: var(--color-teal); }
+    .history-empty {
+      padding: 2rem 1.25rem;
+      text-align: center;
+      font-size: 13px;
+      color: var(--color-text-secondary);
+    }
+    .history-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .history-table th {
+      padding: 8px 12px; text-align: left; font-size: 11px; font-weight: 500;
+      color: var(--color-text-secondary); border-bottom: 0.5px solid var(--color-border);
+      background: var(--color-bg-secondary);
+    }
+    .history-table td { padding: 10px 12px; border-bottom: 0.5px solid var(--color-border); vertical-align: middle; }
+    .history-table tr:last-child td { border-bottom: none; }
+    .history-table tr:hover td { background: var(--color-bg-secondary); }
+    .history-keyword { max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .history-date { color: var(--color-text-secondary); white-space: nowrap; }
+    .history-num { text-align: right; font-variant-numeric: tabular-nums; }
+    .history-rate { font-weight: 500; color: var(--color-teal); text-align: right; }
+    .mode-badge {
+      font-size: 10px; padding: 2px 6px; border-radius: 4px;
+      font-weight: 500; white-space: nowrap;
+    }
+    .mode-badge.keyboard { background: var(--color-purple-bg); color: var(--color-purple); }
+    .mode-badge.voice    { background: var(--color-teal-bg);   color: var(--color-teal); }
+  </style>
+</head>
+<body>
+
+<!-- ふりがなポップアップ -->
+<div class="furigana-popup" id="furigana-popup">
+  <div class="popup-label">「<strong id="popup-selected-text"></strong>」のふりがな</div>
+  <div class="popup-row">
+    <input type="text" id="furigana-input" placeholder="ひらがなで入力" autocomplete="off" />
+    <button class="popup-btn-ok" onclick="confirmFurigana()">追加</button>
+    <button class="popup-btn-cancel" onclick="hideFuriganaPopup()">×</button>
+  </div>
+</div>
+
+<!-- ローディング -->
+<div id="auth-loading">読み込み中…</div>
+
+<!-- アプリ本体 -->
+<div id="app-body">
+
+  <header class="app-header">
+    <div class="app-header-title">
+      <a href="index.html">⌨ キーワードタイピング練習</a>
+    </div>
+    <nav class="app-nav">
+      <a class="nav-tab" href="app-keyboard.html">
+        <i class="ti ti-keyboard"></i> キーボード
+      </a>
+      <a class="nav-tab active" href="app-voice.html">
+        <i class="ti ti-volume"></i> 音声読み上げ
+      </a>
+    </nav>
+    <span class="user-email" id="user-email"></span>
+    <button class="btn-logout" onclick="handleLogout()">ログアウト</button>
+  </header>
+
+  <div class="container">
+
+    <!-- ── 練習エリア ── -->
+    <div class="practice-box">
+      <div class="box-title">
+        <i class="ti ti-volume"></i> 音声読み上げ練習
+      </div>
+
+      <!-- Step 1 -->
+      <div class="step-label"><span class="step-num">1</span> キーワードを入力して練習文を生成</div>
+      <div class="input-row">
+        <input type="text" id="kw-input"
+               placeholder="例：要約筆記、バリアフリー、人工知能…"
+               onkeydown="if(event.key==='Enter')generateText()" />
+        <button class="btn-generate" id="btn-generate" onclick="generateText()">
+          <i class="ti ti-sparkles"></i> 生成
+        </button>
+      </div>
+      <div class="demo-error" id="demo-error"></div>
+      <div class="wiki-credit" id="wiki-credit"></div>
+
+      <!-- 自分の文章 -->
+      <div class="or-row">
+        <div class="or-line"></div>
+        <span class="or-text">または</span>
+        <button class="custom-toggle" onclick="toggleCustomSection()">
+          自分の文章を使う <i class="ti ti-chevron-down" id="custom-toggle-icon"></i>
+        </button>
+        <div class="or-line"></div>
+      </div>
+      <div class="custom-section" id="custom-section" style="display:none">
+        <textarea class="custom-textarea" id="custom-text-input"
+          placeholder="練習したい文章をここに貼り付けてください（200文字以内）"
+          oninput="updateCustomCounter()"></textarea>
+        <div class="custom-footer">
+          <span class="char-counter" id="custom-counter">0 / 200</span>
+          <span class="custom-warning" id="custom-warning" style="display:none">200文字以内にしてください</span>
+          <button class="btn-use-custom" id="btn-use-custom" onclick="useCustomText()" disabled>
+            <i class="ti ti-check"></i> この文章を使う
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step-label"><span class="step-num">2</span> 生成された練習文を音声で聴く</div>
+      <div class="text-box" id="text-box">
+        キーワードを入力して「生成」を押すと、練習文がここに表示されます。
+      </div>
+      <p class="furigana-hint" id="furigana-hint">
+        <i class="ti ti-text-size"></i>
+        読み間違えそうな箇所をドラッグで選択してふりがなを追加できます。
+      </p>
+
+      <!-- ふりがな一覧 -->
+      <div class="annotation-list" id="annotation-list">
+        <div class="ann-list-label"><i class="ti ti-text-size"></i> ふりがな設定（読み上げ時に反映）</div>
+        <div class="ann-chips" id="annotation-items"></div>
+      </div>
+
+      <!-- 音声コントロール -->
+      <div class="voice-controls">
+        <button class="btn-play" id="btn-play" onclick="startSpeech()" disabled>
+          <i class="ti ti-player-play"></i> 読み上げ開始
+        </button>
+        <button class="btn-stop" onclick="stopSpeech()">
+          <i class="ti ti-player-stop"></i> 停止
+        </button>
+        <span class="status-badge" id="status-badge">待機中</span>
+      </div>
+
+      <!-- 音声選択 -->
+      <div class="voice-row">
+        <label for="voice-select"><i class="ti ti-microphone"></i> 音声</label>
+        <select id="voice-select" onchange="onVoiceChange()">
+          <option>読み込み中…</option>
+        </select>
+        <span class="voice-none" id="voice-none" style="display:none">日本語音声が見つかりません</span>
+      </div>
+      <p class="voice-hint">Chrome は「Google 日本語」、Edge は ☁ マーク付きの「Natural」音声がおすすめです。</p>
+      <p class="voice-error" id="voice-error" style="display:none">
+        <i class="ti ti-alert-triangle"></i> この音声は使用できませんでした。別の音声を選んでください。
+      </p>
+
+      <!-- 速度 -->
+      <div class="speed-row">
+        <span class="speed-label"><i class="ti ti-gauge"></i> 速度</span>
+        <div class="speed-btns">
+          <button class="speed-btn" data-rate="0.5" onclick="setSpeed(this)">遅い</button>
+          <button class="speed-btn active" data-rate="0.7" onclick="setSpeed(this)">やや遅い</button>
+          <button class="speed-btn" data-rate="0.9" onclick="setSpeed(this)">ふつう</button>
+          <button class="speed-btn" data-rate="1.1" onclick="setSpeed(this)">やや速い</button>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Step 3 -->
+      <div class="step-label"><span class="step-num">3</span> 聴きながら入力練習</div>
+      <textarea id="typing-box" rows="4" placeholder="ここに入力" oninput="updateStats()"></textarea>
+
+      <!-- アクションボタン -->
+      <div class="action-row">
+        <button class="btn-retry" id="btn-retry" onclick="retryTyping()" disabled>
+          <i class="ti ti-refresh"></i> 再挑戦
+        </button>
+        <button class="btn-new" id="btn-new" onclick="newQuestion()" disabled>
+          <i class="ti ti-plus"></i> 新しい問題
+        </button>
+        <span class="hint-enter">Enter で終了</span>
+        <button class="btn-finish" id="btn-finish" onclick="finishTyping()" disabled>
+          <i class="ti ti-check"></i> 入力終了
+        </button>
+      </div>
+
+      <!-- 統計 -->
+      <div class="stats">
+        <div class="stat" id="s-chars"><div class="val" id="stat-chars">0</div><div class="lbl">入力文字数</div></div>
+        <div class="stat" id="s-rate"><div class="val" id="stat-rate">—</div><div class="lbl">文字包含率</div></div>
+        <div class="stat" id="s-wpm"><div class="val" id="stat-wpm">—</div><div class="lbl">文字/分</div></div>
+        <div class="stat" id="s-time"><div class="val" id="stat-time">0:00</div><div class="lbl">経過時間</div></div>
+      </div>
+      <div class="save-status" id="save-status"></div>
+    </div>
+
+    <!-- ── 練習履歴 ── -->
+    <div class="history-box">
+      <div class="history-header">
+        <i class="ti ti-history"></i> 練習履歴（直近10件）
+      </div>
+      <div class="history-empty" id="history-empty">練習を完了すると記録が表示されます。</div>
+      <table class="history-table" id="history-table" style="display:none">
+        <thead>
+          <tr>
+            <th>種別</th>
+            <th>キーワード</th>
+            <th>日時</th>
+            <th style="text-align:right">文字包含率</th>
+            <th style="text-align:right">文字/分</th>
+            <th style="text-align:right">時間</th>
+          </tr>
+        </thead>
+        <tbody id="history-body"></tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp }
+    from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getAuth, onAuthStateChanged, signOut }
+    from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+  import {
+    getFirestore, collection, addDoc, query,
+    orderBy, limit, getDocs, serverTimestamp
+  } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+  /* ── Firebase 初期化 ── */
+  const firebaseConfig = {
+    apiKey:            "AIzaSyCQhPn3c-dGy-MgaJQQwdEKhRX-9u4-XOs",
+    authDomain:        "keyword-voice-typing-app.firebaseapp.com",
+    projectId:         "keyword-voice-typing-app",
+    storageBucket:     "keyword-voice-typing-app.firebasestorage.app",
+    messagingSenderId: "1080528515023",
+    appId:             "1:1080528515023:web:31964beabb70e5de35ecba"
+  };
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  let currentUser = null;
+
+  /* ── 認証チェック ── */
+  onAuthStateChanged(auth, user => {
+    if (!user) { window.location.href = 'login.html'; return; }
+    currentUser = user;
+    document.getElementById('user-email').textContent = user.email || user.displayName || '';
+    document.getElementById('auth-loading').style.display = 'none';
+    document.getElementById('app-body').style.display = 'block';
+    loadHistory();
+  });
+
+  window.handleLogout = async function() {
+    await signOut(auth);
+    window.location.href = 'login.html';
+  };
+
+  /* ────────── 音声・タイピングロジック ────────── */
+
+  let currentText  = '';
+  let currentKw    = '';
+  let currentRate  = 0.7;
+  let startTime    = null;
+  let timerInterval = null;
+  let finished     = false;
+  let jaVoices     = [];
+  let annotations  = [];
+  let pendingAnn   = null;
+
+  /* ── 音声一覧 ── */
+  function loadVoices() {
+    const all = window.speechSynthesis.getVoices();
+    jaVoices = all.filter(v => v.lang.startsWith('ja'));
+    const sel  = document.getElementById('voice-select');
+    const none = document.getElementById('voice-none');
+    if (jaVoices.length === 0) {
+      sel.style.display = 'none'; none.style.display = 'inline'; return;
+    }
+    sel.style.display = ''; none.style.display = 'none';
+    sel.innerHTML = '';
+    jaVoices.forEach((v, i) => {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = v.name + (v.localService ? '' : ' ☁');
+      sel.appendChild(opt);
+    });
+  }
+  window.onVoiceChange = function() {
+    if (window.speechSynthesis.speaking) startSpeech();
+  };
+  speechSynthesis.onvoiceschanged = loadVoices;
+  loadVoices();
+
+  /* ── Wikipedia API ── */
+  window.generateText = async function() {
+    const kw = document.getElementById('kw-input').value.trim();
+    if (!kw) return;
+
+    const btn    = document.getElementById('btn-generate');
+    const errBox = document.getElementById('demo-error');
+    const credit = document.getElementById('wiki-credit');
+
+    btn.innerHTML = '取得中…'; btn.disabled = true;
+    errBox.style.display = 'none'; credit.style.display = 'none';
+    document.getElementById('text-box').textContent = 'Wikipediaから記事を取得しています…';
+    stopSpeech(); resetStats(); clearAnnotations();
+
+    try {
+      const result = await fetchWikipedia(kw);
+      currentText = result.text;
+      currentKw   = kw;
+      annotations = [];
+      renderTextWithAnnotations();
+      document.getElementById('furigana-hint').classList.add('visible');
+
+      const note = result.redirected
+        ? '「' + kw + '」→「' + result.title + '」にリダイレクト&ensp;|&ensp;' : '';
+      credit.innerHTML = note + '出典: <a href="https://ja.wikipedia.org/wiki/'
+        + encodeURIComponent(result.title) + '" target="_blank" rel="noopener">Wikipedia「'
+        + result.title + '」</a>';
+      credit.style.display = 'block';
+
+      document.getElementById('btn-play').disabled   = false;
+      document.getElementById('btn-retry').disabled  = false;
+      document.getElementById('btn-new').disabled    = false;
+      document.getElementById('btn-finish').disabled = false;
+      document.getElementById('typing-box').value    = '';
+    } catch (e) {
+      errBox.textContent = e.message; errBox.style.display = 'block';
+      document.getElementById('text-box').textContent = 'キーワードを入力して「生成」を押してください。';
+    } finally {
+      btn.innerHTML = '<i class="ti ti-sparkles"></i> 生成'; btn.disabled = false;
+    }
+  };
+
+  async function fetchWikipedia(keyword) {
+    const result = await fetchPage(keyword);
+    if (!result) throw new Error('「' + keyword + '」の文章が取得できませんでした。別のキーワードを試してください。');
+    return result;
+  }
+
+  async function fetchPage(title) {
+    const url = 'https://ja.wikipedia.org/w/api.php?action=query'
+      + '&titles=' + encodeURIComponent(title)
+      + '&prop=extracts&exintro=true&exsentences=4&redirects=1&format=json&origin=*';
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('ネットワークエラーが発生しました。');
+    const data = await res.json();
+    const page = Object.values(data.query.pages)[0];
+    if (page.missing !== undefined) return null;
+    const redirected = page.title !== title;
+    const div = document.createElement('div');
+    div.innerHTML = page.extract;
+    let text = (div.textContent || '').replace(/\s+/g, ' ').trim();
+    text = text.replace(/（[^）]*）/g, '');
+    text = text.replace(/\(/g, '（').replace(/\)/g, '）');
+    text = text.replace(/（[^）]*）/g, '');
+    text = text.replace(/!/g, '！').replace(/\?/g, '？');
+    text = text.replace(/([^\x00-\x7F])\s+([^\x00-\x7F])/g, '$1$2');
+    text = text.replace(/\s+/g, ' ').trim();
+    if (text.replace(/[。、\s]/g, '').length < 15) return null;
+    if (text.length > 250) {
+      const cut = text.indexOf('。', 100);
+      text = cut !== -1 && cut < 280 ? text.slice(0, cut + 1) : text.slice(0, 200) + '。';
+    }
+    if (!text.endsWith('。')) text += '。';
+    return { text, title: page.title, redirected };
+  }
+
+  /* ── テキスト表示 ── */
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function renderTextWithAnnotations() {
+    if (!currentText) return;
+    const sorted = [...annotations].sort((a, b) => a.start - b.start);
+    let html = '', pos = 0;
+    for (const ann of sorted) {
+      for (let i = pos; i < ann.start; i++)
+        html += '<span class="char-span" data-pos="' + i + '">' + esc(currentText[i]) + '</span>';
+      html += '<ruby>'
+        + '<span class="annotated-text" data-ann-s="' + ann.start + '" data-ann-e="' + ann.end + '">'
+        + esc(currentText.slice(ann.start, ann.end))
+        + '</span><rt>' + esc(ann.reading) + '</rt></ruby>';
+      pos = ann.end;
+    }
+    for (let i = pos; i < currentText.length; i++)
+      html += '<span class="char-span" data-pos="' + i + '">' + esc(currentText[i]) + '</span>';
+    document.getElementById('text-box').innerHTML = html;
+  }
+
+  function renderProgress(charIndex, charLen) {
+    if (annotations.length > 0) return;
+    const t = currentText, end = Math.min(charIndex + (charLen || 1), t.length);
+    document.getElementById('text-box').innerHTML =
+      '<span class="spoken">'   + esc(t.slice(0, charIndex)) + '</span>' +
+      '<span class="speaking">' + esc(t.slice(charIndex, end)) + '</span>' +
+      '<span class="unspoken">' + esc(t.slice(end)) + '</span>';
+  }
+
+  /* ── ふりがな選択 ── */
+  document.getElementById('text-box').addEventListener('mouseup', () => {
+    setTimeout(handleTextSelection, 10);
+  });
+
+  function handleTextSelection() {
+    const sel = window.getSelection();
+    if (!sel || sel.isCollapsed || !sel.toString().trim()) return;
+    const range = sel.getRangeAt(0);
+    const textBox = document.getElementById('text-box');
+    if (!textBox.contains(range.commonAncestorContainer)) return;
+
+    let startPos = Infinity, endPos = -1;
+    textBox.querySelectorAll('.char-span').forEach(span => {
+      try { if (range.intersectsNode(span)) {
+        const p = parseInt(span.dataset.pos);
+        if (p < startPos) startPos = p;
+        if (p > endPos) endPos = p;
+      }} catch(_) {}
+    });
+    textBox.querySelectorAll('.annotated-text').forEach(span => {
+      try { if (range.intersectsNode(span)) {
+        const s = parseInt(span.dataset.annS), e = parseInt(span.dataset.annE);
+        if (s < startPos) startPos = s;
+        if (e - 1 > endPos) endPos = e - 1;
+      }} catch(_) {}
+    });
+
+    if (startPos === Infinity || endPos === -1) return;
+    const selectedText = currentText.slice(startPos, endPos + 1);
+    const rect = range.getBoundingClientRect();
+    pendingAnn = { start: startPos, end: endPos + 1, text: selectedText };
+    showFuriganaPopup(selectedText, rect);
+  }
+
+  function showFuriganaPopup(selectedText, rect) {
+    document.getElementById('popup-selected-text').textContent = selectedText;
+    document.getElementById('furigana-input').value = '';
+    const popup = document.getElementById('furigana-popup');
+    popup.style.display = 'block';
+    popup.style.top  = Math.max(8, rect.bottom + 8) + 'px';
+    popup.style.left = Math.max(8, Math.min(rect.left, window.innerWidth - 280)) + 'px';
+    setTimeout(() => document.getElementById('furigana-input').focus(), 30);
+  }
+
+  window.hideFuriganaPopup = function() {
+    document.getElementById('furigana-popup').style.display = 'none';
+    pendingAnn = null;
+    window.getSelection()?.removeAllRanges();
+  };
+
+  window.confirmFurigana = function() {
+    const reading = document.getElementById('furigana-input').value.trim();
+    if (!reading || !pendingAnn) { window.hideFuriganaPopup(); return; }
+    annotations = annotations.filter(a => a.end <= pendingAnn.start || a.start >= pendingAnn.end);
+    annotations.push({ start: pendingAnn.start, end: pendingAnn.end, reading });
+    window.hideFuriganaPopup();
+    renderTextWithAnnotations();
+    renderAnnotationList();
+  };
+
+  window.removeAnnotationByCoords = function(start, end) {
+    annotations = annotations.filter(a => !(a.start === start && a.end === end));
+    renderTextWithAnnotations();
+    renderAnnotationList();
+  };
+
+  function renderAnnotationList() {
+    const list = document.getElementById('annotation-list');
+    const items = document.getElementById('annotation-items');
+    if (annotations.length === 0) { list.style.display = 'none'; return; }
+    list.style.display = 'block';
+    const sorted = [...annotations].sort((a, b) => a.start - b.start);
+    items.innerHTML = sorted.map(ann =>
+      '<span class="ann-chip">'
+      + esc(currentText.slice(ann.start, ann.end))
+      + '<span class="ann-arrow"> → </span>' + esc(ann.reading)
+      + ' <button class="ann-remove" onclick="removeAnnotationByCoords('
+      + ann.start + ',' + ann.end + ')">×</button></span>'
+    ).join('');
+  }
+
+  function clearAnnotations() {
+    annotations = [];
+    document.getElementById('annotation-list').style.display = 'none';
+    document.getElementById('annotation-items').innerHTML = '';
+    document.getElementById('furigana-hint').classList.remove('visible');
+  }
+
+  /* ── TTS テキスト ── */
+  function buildTTSText() {
+    if (annotations.length === 0) return currentText;
+    const sorted = [...annotations].sort((a, b) => a.start - b.start);
+    let result = '', pos = 0;
+    for (const ann of sorted) {
+      result += currentText.slice(pos, ann.start) + ann.reading;
+      pos = ann.end;
+    }
+    return result + currentText.slice(pos);
+  }
+
+  /* ── 速度 ── */
+  window.setSpeed = function(btn) {
+    currentRate = parseFloat(btn.dataset.rate);
+    document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if (window.speechSynthesis.speaking) startSpeech();
+  };
+
+  /* ── 読み上げ ── */
+  function startSpeech() {
+    if (!currentText) return;
+    stopSpeech();
+    const utterance = new SpeechSynthesisUtterance(buildTTSText());
+    utterance.lang = 'ja-JP';
+    utterance.rate = currentRate;
+    const voiceIdx = parseInt(document.getElementById('voice-select').value);
+    if (jaVoices[voiceIdx]) utterance.voice = jaVoices[voiceIdx];
+
+    utterance.onboundary = e => {
+      if (e.name === 'word' || e.name === 'sentence') renderProgress(e.charIndex, e.charLength);
+    };
+    utterance.onstart = () => {
+      setStatus(true);
+      document.getElementById('voice-error').style.display = 'none';
+    };
+    utterance.onend   = () => { setStatus(false); renderTextWithAnnotations(); };
+    utterance.onerror = () => {
+      setStatus(false); renderTextWithAnnotations();
+      document.getElementById('voice-error').style.display = 'flex';
+    };
+    window.speechSynthesis.speak(utterance);
+  }
+  window.startSpeech = startSpeech;
+
+  function stopSpeech() {
+    window.speechSynthesis.cancel();
+    setStatus(false);
+    if (currentText) renderTextWithAnnotations();
+  }
+  window.stopSpeech = stopSpeech;
+
+  function setStatus(playing) {
+    const badge = document.getElementById('status-badge');
+    const btn   = document.getElementById('btn-play');
+    if (playing) {
+      badge.textContent = annotations.length > 0 ? '読み上げ中（ふりがな反映）' : '読み上げ中';
+      badge.classList.add('playing');
+      btn.innerHTML = '<i class="ti ti-player-play"></i> 読み上げ中…';
+    } else {
+      badge.textContent = '待機中';
+      badge.classList.remove('playing');
+      btn.innerHTML = '<i class="ti ti-player-play"></i> 読み上げ開始';
+    }
+  }
+
+  /* ── 再挑戦 ── */
+  window.retryTyping = function() {
+    stopSpeech(); resetStats();
+    document.getElementById('typing-box').value = '';
+    document.getElementById('typing-box').focus();
+  };
+
+  /* ── 新しい問題 ── */
+  window.newQuestion = function() {
+    stopSpeech(); resetStats(); clearAnnotations();
+    currentText = ''; currentKw = '';
+    document.getElementById('typing-box').value = '';
+    document.getElementById('text-box').textContent = 'キーワードを入力して「生成」を押すと、練習文がここに表示されます。';
+    document.getElementById('wiki-credit').style.display = 'none';
+    document.getElementById('demo-error').style.display = 'none';
+    document.getElementById('save-status').style.display = 'none';
+    document.getElementById('btn-play').disabled   = true;
+    document.getElementById('btn-retry').disabled  = true;
+    document.getElementById('btn-new').disabled    = true;
+    document.getElementById('btn-finish').disabled = true;
+    document.getElementById('kw-input').value = '';
+    document.getElementById('kw-input').focus();
+    document.getElementById('custom-text-input').value = '';
+    document.getElementById('custom-counter').textContent = '0 / 200';
+    document.getElementById('custom-counter').classList.remove('over');
+    document.getElementById('custom-warning').style.display = 'none';
+    document.getElementById('btn-use-custom').disabled = true;
+    document.getElementById('custom-section').style.display = 'none';
+    document.getElementById('custom-toggle-icon').className = 'ti ti-chevron-down';
+  };
+
+  /* ── 入力終了 ── */
+  window.finishTyping = function() {
+    if (finished || !startTime) return;
+    finished = true;
+    clearInterval(timerInterval);
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    const typed   = document.getElementById('typing-box').value;
+    const chars   = typed.length;
+    const inc     = currentText.length > 0 ? calcInclusion(typed, currentText) : 0;
+    const cpm     = elapsed > 0 ? Math.round(chars / (elapsed / 60)) : 0;
+
+    document.getElementById('stat-chars').textContent = chars;
+    document.getElementById('stat-rate').textContent  = inc + '%';
+    document.getElementById('stat-wpm').textContent   = cpm;
+    document.getElementById('stat-time').textContent  = fmt(elapsed);
+    ['s-chars', 's-rate', 's-wpm', 's-time'].forEach(id =>
+      document.getElementById(id).classList.add('finished'));
+
+    const finBtn = document.getElementById('btn-finish');
+    finBtn.disabled = true;
+    finBtn.innerHTML = '<i class="ti ti-check"></i> 終了しました';
+
+    saveRecord(currentKw || '自分の文章', chars, elapsed, cpm, inc);
+  };
+
+  /* ── タイマー・統計 ── */
+  function startTimer() {
+    finished = false; startTime = Date.now();
+    timerInterval = setInterval(() => {
+      if (finished) return;
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      document.getElementById('stat-time').textContent = fmt(elapsed);
+      const typed = document.getElementById('typing-box').value;
+      if (typed.length > 0 && elapsed > 0)
+        document.getElementById('stat-wpm').textContent = Math.round(typed.length / (elapsed / 60));
+      if (currentText.length > 0)
+        document.getElementById('stat-rate').textContent = calcInclusion(typed, currentText) + '%';
+    }, 1000);
+  }
+
+  function resetStats() {
+    clearInterval(timerInterval); startTime = null; finished = false;
+    document.getElementById('stat-chars').textContent = '0';
+    document.getElementById('stat-rate').textContent  = '—';
+    document.getElementById('stat-wpm').textContent   = '—';
+    document.getElementById('stat-time').textContent  = '0:00';
+    ['s-chars', 's-rate', 's-wpm', 's-time'].forEach(id =>
+      document.getElementById(id).classList.remove('finished'));
+    const finBtn = document.getElementById('btn-finish');
+    finBtn.disabled = false;
+    finBtn.innerHTML = '<i class="ti ti-check"></i> 入力終了';
+  }
+
+  window.updateStats = function() {
+    if (finished) return;
+    if (!startTime) startTimer();
+    const typed = document.getElementById('typing-box').value;
+    document.getElementById('stat-chars').textContent = typed.length;
+    if (currentText.length > 0)
+      document.getElementById('stat-rate').textContent = calcInclusion(typed, currentText) + '%';
+  };
+
+  /* ── 文字包含率 ── */
+  function calcInclusion(typed, source) {
+    if (!source.length) return 0;
+    const srcMap = {};
+    for (const ch of source) srcMap[ch] = (srcMap[ch] || 0) + 1;
+    const cntMap = {}; let matched = 0;
+    for (const ch of typed) {
+      cntMap[ch] = (cntMap[ch] || 0) + 1;
+      if (cntMap[ch] <= (srcMap[ch] || 0)) matched++;
+    }
+    return Math.round(matched / source.length * 100);
+  }
+
+  function fmt(sec) {
+    return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
+  }
+
+  /* ── 自分の文章 ── */
+  const MAX_CUSTOM = 200;
+
+  window.toggleCustomSection = function() {
+    const section = document.getElementById('custom-section');
+    const icon    = document.getElementById('custom-toggle-icon');
+    const isOpen  = section.style.display !== 'none';
+    section.style.display = isOpen ? 'none' : 'block';
+    icon.className = isOpen ? 'ti ti-chevron-down' : 'ti ti-chevron-up';
+  };
+
+  window.updateCustomCounter = function() {
+    const len     = document.getElementById('custom-text-input').value.length;
+    const counter = document.getElementById('custom-counter');
+    const warning = document.getElementById('custom-warning');
+    counter.textContent = len + ' / ' + MAX_CUSTOM;
+    const over = len > MAX_CUSTOM;
+    counter.classList.toggle('over', over);
+    warning.style.display = over ? 'inline' : 'none';
+    document.getElementById('btn-use-custom').disabled = over || len === 0;
+  };
+
+  window.useCustomText = function() {
+    const text = document.getElementById('custom-text-input').value.trim();
+    if (!text || text.length > MAX_CUSTOM) return;
+    stopSpeech(); resetStats(); clearAnnotations();
+    currentText = text; currentKw = '自分の文章';
+    renderTextWithAnnotations();
+    document.getElementById('furigana-hint').classList.add('visible');
+    document.getElementById('wiki-credit').style.display = 'none';
+    document.getElementById('demo-error').style.display = 'none';
+    document.getElementById('btn-play').disabled   = false;
+    document.getElementById('btn-retry').disabled  = false;
+    document.getElementById('btn-new').disabled    = false;
+    document.getElementById('btn-finish').disabled = false;
+    document.getElementById('typing-box').value    = '';
+    document.getElementById('custom-section').style.display = 'none';
+    document.getElementById('custom-toggle-icon').className = 'ti ti-chevron-down';
+  };
+
+  /* ── キーボード操作 ── */
+  document.getElementById('typing-box').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); window.finishTyping(); }
+  });
+  document.getElementById('furigana-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter')  window.confirmFurigana();
+    if (e.key === 'Escape') window.hideFuriganaPopup();
+  });
+  document.addEventListener('mousedown', e => {
+    const popup = document.getElementById('furigana-popup');
+    if (popup.style.display === 'none') return;
+    if (!popup.contains(e.target) && !document.getElementById('text-box').contains(e.target))
+      window.hideFuriganaPopup();
+  });
+
+  /* ────────── Firestore ────────── */
+
+  async function saveRecord(keyword, chars, elapsed, cpm, inclusion) {
+    if (!currentUser) return;
+    const statusEl = document.getElementById('save-status');
+    statusEl.textContent = '記録を保存中…';
+    statusEl.style.display = 'block';
+    try {
+      await addDoc(collection(db, 'users', currentUser.uid, 'records'), {
+        mode: 'voice',
+        keyword,
+        chars,
+        elapsed,
+        cpm,
+        inclusion,
+        createdAt: serverTimestamp()
+      });
+      statusEl.textContent = '✓ 記録を保存しました';
+      loadHistory();
+    } catch (e) {
+      statusEl.textContent = '保存に失敗しました（' + e.message + '）';
+    }
+  }
+
+  async function loadHistory() {
+    if (!currentUser) return;
+    try {
+      const q    = query(collection(db, 'users', currentUser.uid, 'records'), orderBy('createdAt', 'desc'), limit(10));
+      const snap = await getDocs(q);
+      if (snap.empty) return;
+
+      const tbody = document.getElementById('history-body');
+      tbody.innerHTML = '';
+      snap.forEach(doc => {
+        const d    = doc.data();
+        const date = d.createdAt?.toDate
+          ? d.createdAt.toDate().toLocaleString('ja-JP', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+          : '—';
+        const elapsed = typeof d.elapsed === 'number'
+          ? Math.floor(d.elapsed / 60) + ':' + String(d.elapsed % 60).padStart(2, '0') : '—';
+        const mode  = d.mode === 'keyboard' ? 'keyboard' : 'voice';
+        const modeLabel = mode === 'keyboard' ? '⌨ キーボード' : '🔊 音声';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><span class="mode-badge ${mode}">${modeLabel}</span></td>
+          <td class="history-keyword" title="${escHtml(d.keyword)}">${escHtml(d.keyword)}</td>
+          <td class="history-date">${date}</td>
+          <td class="history-rate">${d.inclusion != null ? d.inclusion + '%' : '—'}</td>
+          <td class="history-num">${d.cpm ?? '—'}</td>
+          <td class="history-num">${elapsed}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('history-empty').style.display = 'none';
+      document.getElementById('history-table').style.display = 'table';
+    } catch (e) {
+      console.error('履歴の読み込みに失敗:', e);
+    }
+  }
+
+  function escHtml(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+</script>
+
+</body>
+</html>

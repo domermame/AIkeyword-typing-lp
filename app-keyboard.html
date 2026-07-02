@@ -80,11 +80,36 @@
       font-size: 15px;
       font-weight: 600;
       letter-spacing: 0.01em;
-      flex: 1;
+      white-space: nowrap;
     }
     .app-header-title a {
       text-decoration: none;
       color: var(--color-text-primary);
+    }
+
+    /* ── ナビタブ ── */
+    .app-nav {
+      display: flex;
+      gap: 4px;
+      flex: 1;
+    }
+    .nav-tab {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      text-decoration: none;
+      color: var(--color-text-secondary);
+      transition: background 0.15s, color 0.15s;
+      white-space: nowrap;
+    }
+    .nav-tab:hover { background: var(--color-bg-secondary); color: var(--color-text-primary); }
+    .nav-tab.active {
+      background: var(--color-purple-bg);
+      color: var(--color-purple);
+      font-weight: 500;
     }
     .user-email {
       font-size: 12.5px;
@@ -352,6 +377,12 @@
     .history-date { color: var(--color-text-secondary); white-space: nowrap; }
     .history-num { text-align: right; font-variant-numeric: tabular-nums; }
     .history-cpm { font-weight: 500; color: var(--color-purple); }
+    .mode-badge {
+      font-size: 10px; padding: 2px 6px; border-radius: 4px;
+      font-weight: 500; white-space: nowrap;
+    }
+    .mode-badge.keyboard { background: var(--color-purple-bg); color: var(--color-purple); }
+    .mode-badge.voice    { background: var(--color-teal-bg);   color: var(--color-teal); }
   </style>
 </head>
 <body>
@@ -366,6 +397,14 @@
     <div class="app-header-title">
       <a href="index.html">⌨ キーワードタイピング練習</a>
     </div>
+    <nav class="app-nav">
+      <a class="nav-tab active" href="app-keyboard.html">
+        <i class="ti ti-keyboard"></i> キーボード
+      </a>
+      <a class="nav-tab" href="app-voice.html">
+        <i class="ti ti-volume"></i> 音声読み上げ
+      </a>
+    </nav>
     <span class="user-email" id="user-email"></span>
     <button class="btn-logout" onclick="handleLogout()">ログアウト</button>
   </header>
@@ -447,6 +486,7 @@
       <table class="history-table" id="history-table" style="display:none">
         <thead>
           <tr>
+            <th>種別</th>
             <th>キーワード</th>
             <th>日時</th>
             <th style="text-align:right">文字数</th>
@@ -793,8 +833,8 @@
     try {
       const ref = collection(db, 'users', currentUser.uid, 'records');
       await addDoc(ref, {
+        mode: 'keyboard',
         keyword,
-        text,
         chars,
         elapsed,
         cpm,
@@ -829,8 +869,11 @@
         const elapsed = typeof d.elapsed === 'number'
           ? Math.floor(d.elapsed / 60) + ':' + String(d.elapsed % 60).padStart(2, '0')
           : '—';
+        const mode = d.mode === 'voice' ? 'voice' : 'keyboard';
+        const modeLabel = mode === 'voice' ? '🔊 音声' : '⌨ キーボード';
         const tr = document.createElement('tr');
         tr.innerHTML = `
+          <td><span class="mode-badge ${mode}">${modeLabel}</span></td>
           <td class="history-keyword" title="${escHtml(d.keyword)}">${escHtml(d.keyword)}</td>
           <td class="history-date">${date}</td>
           <td class="history-num">${d.chars ?? '—'}</td>
