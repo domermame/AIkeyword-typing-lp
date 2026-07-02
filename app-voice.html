@@ -615,7 +615,6 @@
       <table class="history-table" id="history-table" style="display:none">
         <thead>
           <tr>
-            <th>種別</th>
             <th>キーワード</th>
             <th>日時</th>
             <th style="text-align:right">文字包含率</th>
@@ -1163,24 +1162,27 @@
   async function loadHistory() {
     if (!currentUser) return;
     try {
-      const q    = query(collection(db, 'users', currentUser.uid, 'records'), orderBy('createdAt', 'desc'), limit(10));
+      const q    = query(collection(db, 'users', currentUser.uid, 'records'), orderBy('createdAt', 'desc'), limit(50));
       const snap = await getDocs(q);
-      if (snap.empty) return;
+
+      // 音声練習のみ
+      const rows = snap.docs
+        .map(d => d.data())
+        .filter(d => d.mode === 'voice')
+        .slice(0, 10);
+
+      if (rows.length === 0) return;
 
       const tbody = document.getElementById('history-body');
       tbody.innerHTML = '';
-      snap.forEach(doc => {
-        const d    = doc.data();
+      rows.forEach(d => {
         const date = d.createdAt?.toDate
           ? d.createdAt.toDate().toLocaleString('ja-JP', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
           : '—';
         const elapsed = typeof d.elapsed === 'number'
           ? Math.floor(d.elapsed / 60) + ':' + String(d.elapsed % 60).padStart(2, '0') : '—';
-        const mode  = d.mode === 'keyboard' ? 'keyboard' : 'voice';
-        const modeLabel = mode === 'keyboard' ? '⌨ キーボード' : '🔊 音声';
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td><span class="mode-badge ${mode}">${modeLabel}</span></td>
           <td class="history-keyword" title="${escHtml(d.keyword)}">${escHtml(d.keyword)}</td>
           <td class="history-date">${date}</td>
           <td class="history-rate">${d.inclusion != null ? d.inclusion + '%' : '—'}</td>
