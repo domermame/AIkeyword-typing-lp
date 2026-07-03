@@ -377,6 +377,27 @@
     .history-date { color: var(--color-text-secondary); white-space: nowrap; }
     .history-num { text-align: right; font-variant-numeric: tabular-nums; }
     .history-cpm { font-weight: 500; color: var(--color-purple); }
+    .kw-cell { display: flex; align-items: center; gap: 4px; }
+    .kw-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }
+    .kw-edit-btn {
+      background: none; border: none; cursor: pointer; font-size: 11px;
+      color: var(--color-text-secondary); padding: 2px 4px; border-radius: 4px;
+      opacity: 0; flex-shrink: 0; line-height: 1;
+    }
+    tr:hover .kw-edit-btn { opacity: 1; }
+    .kw-input {
+      flex: 1; padding: 3px 6px; border-radius: 4px; min-width: 0;
+      border: 0.5px solid var(--color-purple); background: var(--color-bg);
+      color: var(--color-text-primary); font-size: 13px; font-family: inherit; outline: none;
+    }
+    .kw-save-btn, .kw-cancel-btn {
+      background: none; border: 0.5px solid var(--color-border-md);
+      cursor: pointer; font-size: 12px; padding: 2px 6px; border-radius: 4px;
+      color: var(--color-text-secondary); flex-shrink: 0; font-family: inherit;
+    }
+    .kw-save-btn { color: var(--color-teal); border-color: var(--color-teal); }
+    .kw-save-btn:hover { background: var(--color-teal-bg); }
+    .kw-cancel-btn:hover { background: var(--color-bg-secondary); }
     .mode-badge {
       font-size: 10px; padding: 2px 6px; border-radius: 4px;
       font-weight: 500; white-space: nowrap;
@@ -506,7 +527,7 @@
   import { getAuth, onAuthStateChanged, signOut }
     from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
   import {
-    getFirestore, collection, addDoc, query,
+    getFirestore, collection, addDoc, doc, updateDoc, query,
     orderBy, limit, getDocs, serverTimestamp
   } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
@@ -823,13 +844,20 @@
     document.getElementById('btn-use-custom').disabled = over || len === 0;
   };
 
+  function getNextCustomLabel() {
+    const key = 'customCount_' + currentUser.uid;
+    const n = parseInt(localStorage.getItem(key) || '0') + 1;
+    localStorage.setItem(key, n);
+    return '自分の文章' + n;
+  }
+
   window.useCustomText = function() {
     const text = document.getElementById('custom-text-input').value.trim();
     if (!text || text.length > MAX_CUSTOM) return;
     resetTimer();
     finished = false;
     paused   = false;
-    currentKw = '自分の文章';
+    currentKw = getNextCustomLabel();
     document.getElementById('demo-error').style.display = 'none';
     document.getElementById('wiki-credit').style.display = 'none';
     currentText = text;
@@ -871,7 +899,7 @@
 
       // キーボード練習のみ（mode未設定の旧データも含む）
       const rows = snap.docs
-        .map(d => d.data())
+        .map(d => ({ id: d.id, ...d.data() }))
         .filter(d => !d.mode || d.mode === 'keyboard')
         .slice(0, 10);
 
@@ -891,7 +919,12 @@
           : '—';
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td class="history-keyword" title="${escHtml(d.keyword)}">${escHtml(d.keyword)}</td>
+          <td class="history-keyword" data-doc-id="${d.id}" data-keyword="${escHtml(d.keyword)}">
+            <div class="kw-cell">
+              <span class="kw-label">${escHtml(d.keyword)}</span>
+              <button class="kw-edit-btn" onclick="startEditKeyword(this)" title="ラベルを編集">✏</button>
+            </div>
+          </td>
           <td class="history-date">${date}</td>
           <td class="history-num">${d.chars ?? '—'}</td>
           <td class="history-num history-cpm">${d.cpm ?? '—'}</td>
@@ -914,6 +947,58 @@
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
   }
+
+  /* ── ラベル編集 ── */
+  window.startEditKeyword = function(btn) {
+    const td = btn.closest('td');
+    const docId   = td.dataset.docId;
+    const current = td.dataset.keyword;
+    td.innerHTML = `
+      <div class="kw-cell">
+        <input class="kw-input" value="${escHtml(current)}" maxlength="30" />
+        <button class="kw-save-btn"   onclick="saveKeyword(this)">✓</button>
+        <button class="kw-cancel-btn" onclick="cancelEditKeyword(this)">×</button>
+      </div>
+    `;
+    const input = td.querySelector('.kw-input');
+    input.focus(); input.select();
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter')  window.saveKeyword(td.querySelector('.kw-save-btn'));
+      if (e.key === 'Escape') window.cancelEditKeyword(td.querySelector('.kw-cancel-btn'));
+    });
+  };
+
+  window.saveKeyword = async function(btn) {
+    const td      = btn.closest('td');
+    const docId   = td.dataset.docId;
+    const input   = td.querySelector('.kw-input');
+    const newVal  = input.value.trim() || td.dataset.keyword;
+    btn.disabled  = true;
+    try {
+      await updateDoc(doc(db, 'users', currentUser.uid, 'records', docId), { keyword: newVal });
+      td.dataset.keyword = newVal;
+      td.innerHTML = `
+        <div class="kw-cell">
+          <span class="kw-label">${escHtml(newVal)}</span>
+          <button class="kw-edit-btn" onclick="startEditKeyword(this)" title="ラベルを編集">✏</button>
+        </div>
+      `;
+    } catch (e) {
+      alert('保存に失敗しました: ' + e.message);
+      btn.disabled = false;
+    }
+  };
+
+  window.cancelEditKeyword = function(btn) {
+    const td      = btn.closest('td');
+    const current = td.dataset.keyword;
+    td.innerHTML = `
+      <div class="kw-cell">
+        <span class="kw-label">${escHtml(current)}</span>
+        <button class="kw-edit-btn" onclick="startEditKeyword(this)" title="ラベルを編集">✏</button>
+      </div>
+    `;
+  };
 </script>
 
 </body>
