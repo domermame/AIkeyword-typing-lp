@@ -679,9 +679,12 @@
   }
 
   function onTyping() {
-    if (finished || paused || isComposing) return;
+    if (finished || paused) return;
     const typed = document.getElementById('typing-box').value;
+    // タイマーはIME変換中でも入力開始と同時に起動
     if (typed.length > 0 && !startTime) startTimer();
+    // 色替えと完了チェックはIME確定後のみ
+    if (isComposing) return;
     renderChars(typed);
     if (typed === currentText) stopTimer(typed.length);
   }
