@@ -681,7 +681,7 @@
   function onTyping() {
     if (finished || paused || isComposing) return;
     const typed = document.getElementById('typing-box').value;
-    if (typed.length === 1 && !startTime) startTimer();
+    if (typed.length > 0 && !startTime) startTimer();
     renderChars(typed);
     if (typed === currentText) stopTimer(typed.length);
   }
