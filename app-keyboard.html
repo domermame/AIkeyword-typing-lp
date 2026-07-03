@@ -554,6 +554,7 @@
   let pausedElapsed = 0;
   let finished     = false;
   let paused       = false;
+  let isComposing  = false;
 
   window.generateDemo = async function() {
     const kw = document.getElementById('kw-input').value.trim();
@@ -654,22 +655,31 @@
   function renderChars(typed) {
     const dt = document.getElementById('demo-text');
     dt.innerHTML = '';
+    // 最初のミス位置を検出
+    let firstError = -1;
+    for (let i = 0; i < typed.length; i++) {
+      if (typed[i] !== currentText[i]) { firstError = i; break; }
+    }
     for (let i = 0; i < currentText.length; i++) {
       const span = document.createElement('span');
       span.textContent = currentText[i];
-      if (i < typed.length) {
-        span.className = typed[i] === currentText[i] ? 'char-correct' : 'char-wrong';
-      } else if (i === typed.length) {
-        span.className = 'char-current';
+      if (firstError === -1) {
+        // ミスなし：入力済みを正解色で表示
+        if (i < typed.length)        span.className = 'char-correct';
+        else if (i === typed.length) span.className = 'char-current';
+        else                         span.className = 'char-pending';
       } else {
-        span.className = 'char-pending';
+        // ミスあり：エラー位置で色替えをストップ
+        if (i < firstError)        span.className = 'char-correct';
+        else if (i === firstError) span.className = 'char-wrong';
+        else                       span.className = 'char-pending';
       }
       dt.appendChild(span);
     }
   }
 
   function onTyping() {
-    if (finished || paused) return;
+    if (finished || paused || isComposing) return;
     const typed = document.getElementById('typing-box').value;
     if (typed.length === 1 && !startTime) startTimer();
     renderChars(typed);
@@ -783,7 +793,10 @@
     return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
   }
 
-  document.getElementById('typing-box').addEventListener('input', onTyping);
+  const typingBox = document.getElementById('typing-box');
+  typingBox.addEventListener('compositionstart', () => { isComposing = true; });
+  typingBox.addEventListener('compositionend',   () => { isComposing = false; onTyping(); });
+  typingBox.addEventListener('input', onTyping);
 
   /* ── 自分の文章 ── */
   const MAX_CUSTOM = 200;
