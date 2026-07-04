@@ -61,7 +61,7 @@
       line-height: 1.7;
     }
 
-    .container { max-width: 740px; margin: 0 auto; }
+    .container { max-width: 1100px; margin: 0 auto; }
 
     /* ---- Hero Banner ---- */
     .hero-banner {
@@ -204,7 +204,7 @@
       margin: 2rem 1.5rem;
       background: var(--color-bg-secondary);
       border-radius: var(--radius-xl);
-      padding: 1.75rem;
+      padding: 2rem 2.25rem;
       border: 1px solid var(--color-border);
       box-shadow: var(--shadow-sm);
     }
@@ -212,23 +212,23 @@
       font-size: 12px;
       font-weight: 600;
       color: var(--color-text-secondary);
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       letter-spacing: 0.04em;
       text-transform: uppercase;
     }
     .demo-input-row {
       display: flex;
-      gap: 8px;
+      gap: 10px;
       margin-bottom: 1rem;
     }
     .demo-input-row input {
       flex: 1;
-      padding: 9px 14px;
+      padding: 11px 16px;
       border-radius: var(--radius-md);
       border: 1px solid var(--color-border-md);
       background: var(--color-bg);
       color: var(--color-text-primary);
-      font-size: 14px;
+      font-size: 15px;
       outline: none;
       transition: border-color 0.15s, box-shadow 0.15s;
     }
@@ -237,24 +237,55 @@
       box-shadow: 0 0 0 3px rgba(83,74,183,0.12);
     }
     .demo-input-row button {
-      padding: 9px 18px;
+      padding: 11px 24px;
       background: linear-gradient(135deg, #6c63e0 0%, #534ab7 100%);
       color: #fff;
       border: none;
       border-radius: var(--radius-md);
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       white-space: nowrap;
       transition: opacity 0.15s;
     }
     .demo-input-row button:hover { opacity: 0.88; }
+
+    /* ---- 2カラム練習エリア ---- */
+    .demo-practice-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.75rem;
+      align-items: start;
+      margin-top: 0.5rem;
+    }
+    @media (max-width: 720px) {
+      .demo-practice-grid { grid-template-columns: 1fr; }
+      .demo-box { padding: 1.5rem; }
+    }
+    .demo-left {
+      background: var(--color-bg);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      border: 1px solid var(--color-border);
+      min-height: 240px;
+    }
+    .demo-left-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+    .demo-right {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
     .demo-text {
-      font-size: 15px;
-      line-height: 2;
-      margin-bottom: 1rem;
-      min-height: 4em;
-      letter-spacing: 0.02em;
+      font-size: 17px;
+      line-height: 2.1;
+      letter-spacing: 0.03em;
     }
     .char-pending { color: var(--color-text-secondary); }
     .char-correct { color: #ffffff; background: var(--color-purple); border-radius: 3px; }
@@ -268,7 +299,6 @@
       padding: 10px 16px;
       font-size: 13px;
       color: var(--color-purple);
-      margin-bottom: 1rem;
       text-align: center;
       font-weight: 600;
     }
@@ -286,24 +316,24 @@
       font-size: 11px;
       color: var(--color-text-secondary);
       text-align: right;
-      margin-bottom: 0.5rem;
+      margin-top: 0.5rem;
     }
     .wiki-credit a { color: var(--color-text-secondary); }
     #btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
     #typing-box {
       width: 100%;
-      padding: 10px 14px;
-      margin-bottom: 1rem;
+      padding: 14px 16px;
       border-radius: var(--radius-md);
       border: 1px solid var(--color-border-md);
       background: var(--color-bg);
       color: var(--color-text-primary);
-      font-size: 14px;
+      font-size: 16px;
       font-family: inherit;
-      line-height: 1.7;
+      line-height: 1.8;
       resize: none;
       outline: none;
       transition: border-color 0.15s, box-shadow 0.15s;
+      min-height: 120px;
     }
     #typing-box:focus {
       border-color: var(--color-purple);
@@ -314,22 +344,21 @@
       flex: 1;
       background: var(--color-bg);
       border-radius: var(--radius-md);
-      padding: 12px 10px;
+      padding: 14px 10px;
       text-align: center;
       border: 1px solid var(--color-border);
       box-shadow: var(--shadow-sm);
     }
-    .demo-stat .val { font-size: 22px; font-weight: 700; color: var(--color-purple); }
+    .demo-stat .val { font-size: 26px; font-weight: 700; color: var(--color-purple); }
     .demo-stat .lbl { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
     .demo-buttons {
       display: flex;
       gap: 8px;
-      margin-top: 12px;
       flex-wrap: wrap;
     }
     .demo-btn {
       flex: 1;
-      padding: 9px 8px;
+      padding: 10px 8px;
       border-radius: var(--radius-md);
       font-size: 13px;
       font-weight: 500;
@@ -689,18 +718,27 @@
       </div>
     </div>
 
-    <div class="demo-text" id="demo-text"><span class="char-pending">キーワードを入力して「生成」を押してください。</span></div>
-    <div class="wiki-credit" id="wiki-credit" style="display:none"></div>
-    <div class="demo-result" id="demo-result"></div>
-    <textarea id="typing-box" placeholder="ここに入力（生成後に入力できます）" rows="3" disabled></textarea>
-    <div class="demo-stats">
-      <div class="demo-stat"><div class="val" id="wpm-val">—</div><div class="lbl">文字/分</div></div>
-      <div class="demo-stat"><div class="val" id="time-val">0:00</div><div class="lbl">経過時間</div></div>
-    </div>
-    <div class="demo-buttons">
-      <button class="demo-btn" id="btn-retry"    onclick="retryDemo()"  disabled>再挑戦</button>
-      <button class="demo-btn" id="btn-new"      onclick="newDemo()"    disabled>新しい問題</button>
-      <button class="demo-btn demo-btn-pause" id="btn-pause" onclick="togglePause()" disabled>一時停止</button>
+    <div class="demo-practice-grid">
+      <!-- 左：練習文 -->
+      <div class="demo-left">
+        <div class="demo-left-label">練習文</div>
+        <div class="demo-text" id="demo-text"><span class="char-pending">キーワードを入力して「生成」を押してください。</span></div>
+        <div class="wiki-credit" id="wiki-credit" style="display:none"></div>
+      </div>
+      <!-- 右：入力エリア -->
+      <div class="demo-right">
+        <div class="demo-result" id="demo-result"></div>
+        <textarea id="typing-box" placeholder="ここに入力（生成後に入力できます）" rows="5" disabled></textarea>
+        <div class="demo-stats">
+          <div class="demo-stat"><div class="val" id="wpm-val">—</div><div class="lbl">文字/分</div></div>
+          <div class="demo-stat"><div class="val" id="time-val">0:00</div><div class="lbl">経過時間</div></div>
+        </div>
+        <div class="demo-buttons">
+          <button class="demo-btn" id="btn-retry"    onclick="retryDemo()"  disabled>再挑戦</button>
+          <button class="demo-btn" id="btn-new"      onclick="newDemo()"    disabled>新しい問題</button>
+          <button class="demo-btn demo-btn-pause" id="btn-pause" onclick="togglePause()" disabled>一時停止</button>
+        </div>
+      </div>
     </div>
   </div>
 
