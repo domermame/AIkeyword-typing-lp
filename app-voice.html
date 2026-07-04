@@ -264,6 +264,9 @@
 
     /* ── 音声コントロール ── */
     .voice-controls { display: flex; gap: 10px; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; }
+    .step3-header { display: flex; align-items: center; justify-content: flex-start; flex-wrap: wrap; gap: 10px; margin-bottom: 6px; }
+    .step3-header .step-label { margin-bottom: 0; margin-right: 12px; }
+    .step3-header .voice-controls { margin-bottom: 0; }
     .btn-play {
       display: flex; align-items: center; gap: 8px; padding: 10px 20px;
       background: var(--color-teal); color: var(--color-teal-bg);
@@ -562,17 +565,6 @@
         <div class="ann-chips" id="annotation-items"></div>
       </div>
 
-      <!-- 音声コントロール -->
-      <div class="voice-controls">
-        <button class="btn-play" id="btn-play" onclick="startSpeech()" disabled>
-          <i class="ti ti-player-play"></i> 読み上げ開始
-        </button>
-        <button class="btn-stop" onclick="stopSpeech()">
-          <i class="ti ti-player-stop"></i> 停止
-        </button>
-        <span class="status-badge" id="status-badge">待機中</span>
-      </div>
-
       <!-- 音声選択 -->
       <div class="voice-row">
         <label for="voice-select"><i class="ti ti-microphone"></i> 音声</label>
@@ -600,7 +592,18 @@
       <div class="divider"></div>
 
       <!-- Step 3 -->
-      <div class="step-label"><span class="step-num">3</span> 聴きながら入力練習</div>
+      <div class="step3-header">
+        <div class="step-label"><span class="step-num">3</span> 聴きながら入力練習</div>
+        <div class="voice-controls">
+          <button class="btn-play" id="btn-play" onclick="startSpeech()" disabled>
+            <i class="ti ti-player-play"></i> 読み上げ開始
+          </button>
+          <button class="btn-stop" onclick="stopSpeech()">
+            <i class="ti ti-player-stop"></i> 停止
+          </button>
+          <span class="status-badge" id="status-badge">待機中</span>
+        </div>
+      </div>
       <textarea id="typing-box" rows="4" placeholder="ここに入力" oninput="updateStats()"></textarea>
 
       <!-- アクションボタン -->
