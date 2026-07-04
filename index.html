@@ -250,37 +250,30 @@
     }
     .demo-input-row button:hover { opacity: 0.88; }
 
-    /* ---- 2カラム練習エリア ---- */
-    .demo-practice-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.75rem;
-      align-items: start;
-      margin-top: 0.5rem;
-    }
     @media (max-width: 720px) {
-      .demo-practice-grid { grid-template-columns: 1fr; }
       .demo-box { padding: 1.5rem; }
     }
-    .demo-left {
+
+    /* ---- 練習エリア（縦並び） ---- */
+    .demo-practice-block {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+    .demo-panel {
       background: var(--color-bg);
       border-radius: var(--radius-lg);
-      padding: 1.5rem;
+      padding: 1.25rem 1.5rem;
       border: 1px solid var(--color-border);
-      min-height: 240px;
     }
-    .demo-left-label {
+    .demo-panel-label {
       font-size: 11px;
       font-weight: 600;
       color: var(--color-text-secondary);
       letter-spacing: 0.05em;
       text-transform: uppercase;
-      margin-bottom: 0.75rem;
-    }
-    .demo-right {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
+      margin-bottom: 0.6rem;
     }
     .demo-text {
       font-size: 17px;
@@ -718,15 +711,16 @@
       </div>
     </div>
 
-    <div class="demo-practice-grid">
-      <!-- 左：練習文 -->
-      <div class="demo-left">
-        <div class="demo-left-label">練習文</div>
+    <div class="demo-practice-block">
+      <!-- 練習文パネル -->
+      <div class="demo-panel">
+        <div class="demo-panel-label">練習文</div>
         <div class="demo-text" id="demo-text"><span class="char-pending">キーワードを入力して「生成」を押してください。</span></div>
         <div class="wiki-credit" id="wiki-credit" style="display:none"></div>
       </div>
-      <!-- 右：入力エリア -->
-      <div class="demo-right">
+      <!-- 入力パネル -->
+      <div class="demo-panel">
+        <div class="demo-panel-label">入力</div>
         <div class="demo-result" id="demo-result"></div>
         <textarea id="typing-box" placeholder="ここに入力（生成後に入力できます）" rows="5" disabled></textarea>
         <div class="demo-stats">
