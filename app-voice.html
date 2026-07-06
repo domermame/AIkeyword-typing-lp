@@ -538,11 +538,11 @@
       </div>
       <div class="custom-section" id="custom-section" style="display:none">
         <textarea class="custom-textarea" id="custom-text-input"
-          placeholder="練習したい文章をここに貼り付けてください（200文字以内）"
+          placeholder="練習したい文章をここに貼り付けてください（500文字以内）"
           oninput="updateCustomCounter()"></textarea>
         <div class="custom-footer">
-          <span class="char-counter" id="custom-counter">0 / 200</span>
-          <span class="custom-warning" id="custom-warning" style="display:none">200文字以内にしてください</span>
+          <span class="char-counter" id="custom-counter">0 / 500</span>
+          <span class="custom-warning" id="custom-warning" style="display:none">500文字以内にしてください</span>
           <button class="btn-use-custom" id="btn-use-custom" onclick="useCustomText()" disabled>
             <i class="ti ti-check"></i> この文章を使う
           </button>
@@ -552,7 +552,7 @@
       <!-- Step 2 -->
       <div class="step-label"><span class="step-num">2</span> 生成された練習文を音声で聴く</div>
       <div class="text-box" id="text-box">
-        キーワードを入力して「生成」を押すと、練習文がここに表示されます。
+        キーワードを入力して「生成」を押してください。または、「自分の文章を使う」をクリックして、好きな文章を貼り付けてください。
       </div>
       <p class="furigana-hint" id="furigana-hint">
         <i class="ti ti-text-size"></i>
@@ -766,7 +766,7 @@
       document.getElementById('typing-box').value    = '';
     } catch (e) {
       errBox.textContent = e.message; errBox.style.display = 'block';
-      document.getElementById('text-box').textContent = 'キーワードを入力して「生成」を押してください。';
+      document.getElementById('text-box').textContent = 'キーワードを入力して「生成」を押してください。または、「自分の文章を使う」をクリックして、好きな文章を貼り付けてください。';
     } finally {
       btn.innerHTML = '<i class="ti ti-sparkles"></i> 生成'; btn.disabled = false;
     }
@@ -1006,7 +1006,7 @@
     stopSpeech(); resetStats(); clearAnnotations();
     currentText = ''; currentKw = '';
     document.getElementById('typing-box').value = '';
-    document.getElementById('text-box').textContent = 'キーワードを入力して「生成」を押すと、練習文がここに表示されます。';
+    document.getElementById('text-box').textContent = 'キーワードを入力して「生成」を押してください。または、「自分の文章を使う」をクリックして、好きな文章を貼り付けてください。';
     document.getElementById('wiki-credit').style.display = 'none';
     document.getElementById('demo-error').style.display = 'none';
     document.getElementById('save-status').style.display = 'none';
@@ -1017,7 +1017,7 @@
     document.getElementById('kw-input').value = '';
     document.getElementById('kw-input').focus();
     document.getElementById('custom-text-input').value = '';
-    document.getElementById('custom-counter').textContent = '0 / 200';
+    document.getElementById('custom-counter').textContent = '0 / 500';
     document.getElementById('custom-counter').classList.remove('over');
     document.getElementById('custom-warning').style.display = 'none';
     document.getElementById('btn-use-custom').disabled = true;
@@ -1105,7 +1105,7 @@
   }
 
   /* ── 自分の文章 ── */
-  const MAX_CUSTOM = 200;
+  const MAX_CUSTOM = 500;
 
   window.toggleCustomSection = function() {
     const section = document.getElementById('custom-section');
