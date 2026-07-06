@@ -711,11 +711,11 @@
     </div>
     <div class="custom-section" id="custom-section" style="display:none">
       <textarea class="custom-textarea" id="custom-text-input"
-        placeholder="練習したい文章をここに貼り付けてください（200文字以内）"
+        placeholder="練習したい文章をここに貼り付けてください（500文字以内）"
         oninput="updateCustomCounter()"></textarea>
       <div class="custom-footer">
-        <span class="char-counter" id="custom-counter">0 / 200</span>
-        <span class="custom-warning" id="custom-warning" style="display:none">200文字以内にしてください</span>
+        <span class="char-counter" id="custom-counter">0 / 500</span>
+        <span class="custom-warning" id="custom-warning" style="display:none">500文字以内にしてください</span>
         <button class="btn-use-custom" id="btn-use-custom" onclick="useCustomText()" disabled>
           <i class="ti ti-check" aria-hidden="true"></i> この文章を使う
         </button>
@@ -726,7 +726,7 @@
       <!-- 練習文パネル -->
       <div class="demo-panel">
         <div class="demo-panel-label">練習文</div>
-        <div class="demo-text" id="demo-text"><span class="char-pending">キーワードを入力して「生成」を押してください。</span></div>
+        <div class="demo-text" id="demo-text"><span class="char-pending">キーワードを入力して「生成」を押してください。または、「自分の文章を使う」をクリックして、好きな文章を貼り付けてください。</span></div>
         <div class="wiki-credit" id="wiki-credit" style="display:none"></div>
       </div>
       <!-- 入力パネル -->
@@ -927,7 +927,7 @@
     } catch (e) {
       errBox.textContent = e.message;
       errBox.style.display = 'block';
-      document.getElementById('demo-text').innerHTML = '<span class="char-pending">キーワードを入力して「生成」を押してください。</span>';
+      document.getElementById('demo-text').innerHTML = '<span class="char-pending">キーワードを入力して「生成」を押してください。または、「自分の文章を使う」をクリックして、好きな文章を貼り付けてください。</span>';
     } finally {
       btn.textContent = '生成';
       btn.disabled = false;
@@ -1077,7 +1077,7 @@
     finished = false;
     paused = false;
     currentText = '';
-    document.getElementById('demo-text').innerHTML = '<span class="char-pending">キーワードを入力して「生成」を押してください。</span>';
+    document.getElementById('demo-text').innerHTML = '<span class="char-pending">キーワードを入力して「生成」を押してください。または、「自分の文章を使う」をクリックして、好きな文章を貼り付けてください。</span>';
     document.getElementById('typing-box').value = '';
     document.getElementById('typing-box').disabled = true;
     document.getElementById('typing-box').placeholder = 'ここに入力（生成後に入力できます）';
@@ -1087,7 +1087,7 @@
     document.getElementById('kw-input').focus();
     setButtonState(false);
     document.getElementById('custom-text-input').value = '';
-    document.getElementById('custom-counter').textContent = '0 / 200';
+    document.getElementById('custom-counter').textContent = '0 / 500';
     document.getElementById('custom-counter').classList.remove('over');
     document.getElementById('custom-warning').style.display = 'none';
     document.getElementById('btn-use-custom').disabled = true;
@@ -1136,7 +1136,7 @@
   document.getElementById('typing-box').addEventListener('input', onTyping);
 
   /* ---- 自分の文章 ---- */
-  const MAX_CUSTOM = 200;
+  const MAX_CUSTOM = 500;
 
   function toggleCustomSection() {
     const section = document.getElementById('custom-section');
