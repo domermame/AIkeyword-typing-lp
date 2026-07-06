@@ -622,7 +622,7 @@
 
       <!-- 統計 -->
       <div class="stats">
-        <div class="stat" id="s-chars"><div class="val" id="stat-chars">0</div><div class="lbl">入力文字数</div></div>
+        <div class="stat" id="s-chars"><div class="val" id="stat-chars">0</div><div class="lbl">入力文字数／文字数</div></div>
         <div class="stat" id="s-rate"><div class="val" id="stat-rate">—</div><div class="lbl">文字包含率</div></div>
         <div class="stat" id="s-wpm"><div class="val" id="stat-wpm">—</div><div class="lbl">文字/分</div></div>
         <div class="stat" id="s-time"><div class="val" id="stat-time">0:00</div><div class="lbl">経過時間</div></div>
@@ -1036,7 +1036,7 @@
     const inc     = currentText.length > 0 ? calcInclusion(typed, currentText) : 0;
     const cpm     = elapsed > 0 ? Math.round(chars / (elapsed / 60)) : 0;
 
-    document.getElementById('stat-chars').textContent = chars;
+    document.getElementById('stat-chars').textContent = chars + ' / ' + currentText.length;
     document.getElementById('stat-rate').textContent  = inc + '%';
     document.getElementById('stat-wpm').textContent   = cpm;
     document.getElementById('stat-time').textContent  = fmt(elapsed);
@@ -1067,7 +1067,7 @@
 
   function resetStats() {
     clearInterval(timerInterval); startTime = null; finished = false;
-    document.getElementById('stat-chars').textContent = '0';
+    document.getElementById('stat-chars').textContent = '0 / ' + (currentText.length || 0);
     document.getElementById('stat-rate').textContent  = '—';
     document.getElementById('stat-wpm').textContent   = '—';
     document.getElementById('stat-time').textContent  = '0:00';
@@ -1082,7 +1082,7 @@
     if (finished) return;
     if (!startTime) startTimer();
     const typed = document.getElementById('typing-box').value;
-    document.getElementById('stat-chars').textContent = typed.length;
+    document.getElementById('stat-chars').textContent = typed.length + ' / ' + currentText.length;
     if (currentText.length > 0)
       document.getElementById('stat-rate').textContent = calcInclusion(typed, currentText) + '%';
   };
