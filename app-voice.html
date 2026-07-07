@@ -1305,8 +1305,8 @@
           plugins: { legend: { labels: { color: textColor } } },
           scales: {
             x: { ticks: { color: textColor } },
-            y:  { type: 'linear', position: 'left',  ticks: { color: textColor }, title: { display: true, text: '文字/分', color: textColor } },
-            y1: { type: 'linear', position: 'right', ticks: { color: textColor }, title: { display: true, text: '文字包含率(%)', color: textColor }, grid: { drawOnChartArea: false } }
+            y:  { type: 'linear', position: 'left',  min: 60, max: 150, ticks: { color: textColor }, title: { display: true, text: '文字/分', color: textColor } },
+            y1: { type: 'linear', position: 'right', min: 25, max: 100, ticks: { color: textColor }, title: { display: true, text: '文字包含率(%)', color: textColor }, grid: { drawOnChartArea: false } }
           }
         }
       });
