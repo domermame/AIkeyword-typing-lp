@@ -328,6 +328,32 @@
       color: var(--color-purple);
     }
 
+    /* ── 成長グラフ ── */
+    .growth-box {
+      background: var(--color-bg);
+      border-radius: var(--radius-lg);
+      border: 0.5px solid var(--color-border);
+      overflow: hidden;
+      margin-bottom: 1.25rem;
+    }
+    .growth-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 0.5px solid var(--color-border);
+      font-size: 13px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .growth-header i { color: var(--color-purple); }
+    .growth-empty {
+      padding: 2rem 1.25rem;
+      text-align: center;
+      font-size: 13px;
+      color: var(--color-text-secondary);
+    }
+    .growth-chart-wrap { padding: 1.25rem; }
+
     /* ── 履歴セクション ── */
     .history-box {
       background: var(--color-bg);
@@ -502,6 +528,17 @@
       </div>
     </div>
 
+    <!-- ── 成長グラフ ── -->
+    <div class="growth-box">
+      <div class="growth-header">
+        <i class="ti ti-chart-line"></i> 成長グラフ（日別の平均）
+      </div>
+      <div class="growth-empty" id="growth-empty">練習の記録が2件以上たまるとグラフが表示されます。</div>
+      <div class="growth-chart-wrap" id="growth-chart-wrap" style="display:none">
+        <canvas id="growth-chart" height="220"></canvas>
+      </div>
+    </div>
+
     <!-- ── 練習履歴 ── -->
     <div class="history-box">
       <div class="history-header">
@@ -525,6 +562,7 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <script type="module">
   import { initializeApp }
     from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
@@ -562,6 +600,7 @@
     document.getElementById('auth-loading').style.display = 'none';
     document.getElementById('app-body').style.display = 'block';
     loadHistory();
+    loadGrowthChart();
   });
 
   /* ── ログアウト ── */
@@ -889,8 +928,81 @@
       });
       statusEl.textContent = '✓ 記録を保存しました';
       loadHistory();
+      loadGrowthChart();
     } catch (e) {
       statusEl.textContent = '保存に失敗しました（' + e.message + '）';
+    }
+  }
+
+  let growthChart = null;
+
+  async function loadGrowthChart() {
+    if (!currentUser) return;
+    try {
+      const ref  = collection(db, 'users', currentUser.uid, 'records');
+      const q    = query(ref, orderBy('createdAt', 'desc'), limit(200));
+      const snap = await getDocs(q);
+
+      const rows = snap.docs
+        .map(d => d.data())
+        .filter(d => (!d.mode || d.mode === 'keyboard') && d.createdAt?.toDate);
+
+      if (rows.length < 2) {
+        document.getElementById('growth-empty').style.display = 'block';
+        document.getElementById('growth-chart-wrap').style.display = 'none';
+        return;
+      }
+
+      // ── 日付ごとに平均を集計 ──
+      const byDate = new Map();
+      rows.forEach(d => {
+        const date = d.createdAt.toDate();
+        const key  = date.toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' });
+        if (!byDate.has(key)) byDate.set(key, { cpmSum: 0, count: 0, sortKey: date });
+        const entry = byDate.get(key);
+        entry.cpmSum += (typeof d.cpm === 'number' ? d.cpm : 0);
+        entry.count  += 1;
+      });
+
+      const sortedKeys = [...byDate.keys()].sort((a, b) => byDate.get(a).sortKey - byDate.get(b).sortKey);
+      const labels  = sortedKeys.map(k => k.slice(5));
+      const cpmData = sortedKeys.map(k => Math.round(byDate.get(k).cpmSum / byDate.get(k).count));
+
+      document.getElementById('growth-empty').style.display = 'none';
+      document.getElementById('growth-chart-wrap').style.display = 'block';
+
+      const style     = getComputedStyle(document.documentElement);
+      const purple    = style.getPropertyValue('--color-purple').trim();
+      const textColor = style.getPropertyValue('--color-text-secondary').trim();
+
+      if (growthChart) growthChart.destroy();
+      const ctx = document.getElementById('growth-chart').getContext('2d');
+      growthChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: '文字/分（平均）',
+              data: cpmData,
+              borderColor: purple,
+              backgroundColor: purple,
+              tension: 0.3
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          interaction: { mode: 'index', intersect: false },
+          plugins: { legend: { labels: { color: textColor } } },
+          scales: {
+            x: { ticks: { color: textColor } },
+            y: { ticks: { color: textColor }, title: { display: true, text: '文字/分', color: textColor } }
+          }
+        }
+      });
+    } catch (e) {
+      console.error('成長グラフの読み込みに失敗:', e);
     }
   }
 
