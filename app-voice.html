@@ -413,7 +413,6 @@
       border-radius: var(--radius-lg);
       border: 0.5px solid var(--color-border);
       overflow: hidden;
-      margin-bottom: 1.25rem;
     }
     .growth-header {
       padding: 1rem 1.25rem;
@@ -439,6 +438,7 @@
       border-radius: var(--radius-lg);
       border: 0.5px solid var(--color-border);
       overflow: hidden;
+      margin-bottom: 1.25rem;
     }
     .history-header {
       padding: 1rem 1.25rem;
@@ -656,17 +656,6 @@
       <div class="save-status" id="save-status"></div>
     </div>
 
-    <!-- ── 成長グラフ ── -->
-    <div class="growth-box">
-      <div class="growth-header">
-        <i class="ti ti-chart-line"></i> 成長グラフ（日別の平均）
-      </div>
-      <div class="growth-empty" id="growth-empty">練習の記録が2件以上たまるとグラフが表示されます。</div>
-      <div class="growth-chart-wrap" id="growth-chart-wrap" style="display:none">
-        <canvas id="growth-chart" height="220"></canvas>
-      </div>
-    </div>
-
     <!-- ── 練習履歴 ── -->
     <div class="history-box">
       <div class="history-header">
@@ -685,6 +674,17 @@
         </thead>
         <tbody id="history-body"></tbody>
       </table>
+    </div>
+
+    <!-- ── 成長グラフ ── -->
+    <div class="growth-box">
+      <div class="growth-header">
+        <i class="ti ti-chart-line"></i> 成長グラフ（日別の平均）
+      </div>
+      <div class="growth-empty" id="growth-empty">練習の記録が2件以上たまるとグラフが表示されます。</div>
+      <div class="growth-chart-wrap" id="growth-chart-wrap" style="display:none">
+        <canvas id="growth-chart" height="120"></canvas>
+      </div>
     </div>
 
   </div>
@@ -1301,6 +1301,8 @@
         },
         options: {
           responsive: true,
+          maintainAspectRatio: true,
+          aspectRatio: 3.5,
           interaction: { mode: 'index', intersect: false },
           plugins: { legend: { labels: { color: textColor } } },
           scales: {
