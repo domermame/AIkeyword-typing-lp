@@ -549,13 +549,13 @@
     errBox.style.display = 'none'; credit.style.display = 'none';
     document.getElementById('text-box').textContent = 'Wikipediaから記事を取得しています…';
     stopSpeech();
-    resetStats();
     clearAnnotations();
 
     try {
       const result = await fetchWikipedia(kw);
       currentText = result.text;
       annotations = [];
+      resetStats();
       renderTextWithAnnotations();
       document.getElementById('furigana-hint').classList.add('visible');
 
@@ -842,8 +842,9 @@
 
   /* ---- 新しい問題 ---- */
   function newQuestion() {
-    stopSpeech(); resetStats(); clearAnnotations();
+    stopSpeech(); clearAnnotations();
     currentText = '';
+    resetStats();
     document.getElementById('typing-box').value = '';
     document.getElementById('text-box').textContent = 'キーワードを入力して「生成」を押してください。または、「自分の文章を使う」をクリックして、好きな文章を貼り付けてください。';
     document.getElementById('wiki-credit').style.display = 'none';
@@ -968,10 +969,10 @@
     if (!text || text.length > MAX_CUSTOM) return;
 
     stopSpeech();
-    resetStats();
     clearAnnotations();
 
     currentText = text;
+    resetStats();
     renderTextWithAnnotations();
     document.getElementById('furigana-hint').classList.add('visible');
     document.getElementById('wiki-credit').style.display = 'none';
