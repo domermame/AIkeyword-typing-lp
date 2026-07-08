@@ -603,7 +603,7 @@
       <!-- Step 2 -->
       <div class="step-label"><span class="step-num">2</span> 生成された練習文を音声で聴く</div>
       <div class="text-box" id="text-box">
-        キーワードを入力して「生成」を押してください。または、「自分の文章を使う」をクリックして、好きな文章を貼り付けてください。
+        キーワードを入力して「生成」を押してください。または、「自分の文章を使う」をクリックして、好きな文章を貼り付けてください。読み間違える単語は選択してふりがなを登録できます。
       </div>
       <p class="furigana-hint" id="furigana-hint">
         <i class="ti ti-text-size"></i>
@@ -838,7 +838,7 @@
       document.getElementById('typing-box').value    = '';
     } catch (e) {
       errBox.textContent = e.message; errBox.style.display = 'block';
-      document.getElementById('text-box').textContent = 'キーワードを入力して「生成」を押してください。または、「自分の文章を使う」をクリックして、好きな文章を貼り付けてください。';
+      document.getElementById('text-box').textContent = 'キーワードを入力して「生成」を押してください。または、「自分の文章を使う」をクリックして、好きな文章を貼り付けてください。読み間違える単語は選択してふりがなを登録できます。';
     } finally {
       btn.innerHTML = '<i class="ti ti-sparkles"></i> 生成'; btn.disabled = false;
     }
@@ -1114,7 +1114,7 @@
     currentText = ''; currentKw = '';
     resetStats();
     document.getElementById('typing-box').value = '';
-    document.getElementById('text-box').textContent = 'キーワードを入力して「生成」を押してください。または、「自分の文章を使う」をクリックして、好きな文章を貼り付けてください。';
+    document.getElementById('text-box').textContent = 'キーワードを入力して「生成」を押してください。または、「自分の文章を使う」をクリックして、好きな文章を貼り付けてください。読み間違える単語は選択してふりがなを登録できます。';
     document.getElementById('wiki-credit').style.display = 'none';
     document.getElementById('demo-error').style.display = 'none';
     document.getElementById('save-status').style.display = 'none';
