@@ -162,6 +162,10 @@
       color: var(--color-text-primary);
       box-shadow: var(--shadow-sm);
       transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+      width: 100%;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
     }
     .demo-card-active {
       border-color: var(--color-purple);
@@ -322,8 +326,8 @@
       margin-top: 0.5rem;
     }
     .wiki-credit a { color: var(--color-text-secondary); }
-    #btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
-    #typing-box {
+    #btn-generate:disabled, #vd-btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
+    #typing-box, #vd-typing-box {
       width: 100%;
       padding: 14px 16px;
       border-radius: var(--radius-md);
@@ -339,7 +343,7 @@
       transition: border-color 0.15s, box-shadow 0.15s;
       min-height: 130px;
     }
-    #typing-box:focus {
+    #typing-box:focus, #vd-typing-box:focus {
       border-color: var(--color-purple);
       box-shadow: 0 0 0 3px rgba(83,74,183,0.12);
     }
@@ -355,6 +359,8 @@
     }
     .demo-stat .val { font-size: 26px; font-weight: 700; color: var(--color-purple); }
     .demo-stat .lbl { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+    .demo-stat.finished { border-color: var(--color-purple); background: var(--color-purple-bg); }
+    .demo-stat.finished .val { color: var(--color-purple); }
     .demo-buttons {
       display: flex;
       gap: 8px;
@@ -418,6 +424,121 @@
     }
     .btn-use-custom:hover { opacity: 0.88; }
     .btn-use-custom:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ---- 音声読み上げデモ ---- */
+    .vd-text-box {
+      font-size: 17px; line-height: 2.1; letter-spacing: 0.03em;
+      display: block; width: 100%; min-height: 130px;
+      padding: 14px 16px; border-radius: var(--radius-md);
+      border: 1px solid var(--color-border-md); background: var(--color-bg);
+      box-sizing: border-box; overflow-y: auto; cursor: text; user-select: text;
+      color: var(--color-text-secondary);
+    }
+    .vd-text-box .char-span { display: inline; color: var(--color-text-primary); }
+    .vd-text-box .spoken   { color: var(--color-text-secondary); opacity: 0.5; }
+    .vd-text-box .speaking { background: var(--color-teal); color: #fff; border-radius: 3px; padding: 1px 2px; }
+    .vd-text-box .unspoken { color: var(--color-text-primary); }
+    ruby { display: inline ruby; }
+    rt { font-size: 0.55em; color: var(--color-purple); letter-spacing: 0.02em; }
+    .annotated-text { border-bottom: 1.5px solid var(--color-purple); color: var(--color-text-primary); }
+
+    .vd-annotation-list {
+      display: none; background: var(--color-purple-bg);
+      border: 1px solid var(--color-border); border-radius: var(--radius-md);
+      padding: 8px 12px; margin-top: 0.75rem; font-size: 13px;
+    }
+    .vd-ann-list-label { font-size: 11px; color: var(--color-purple); margin-bottom: 6px; display: flex; align-items: center; gap: 4px; }
+    .vd-ann-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .vd-ann-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: var(--color-bg); border: 1px solid var(--color-border-md);
+      border-radius: 20px; padding: 3px 10px; font-size: 12px; color: var(--color-text-primary);
+    }
+    .vd-ann-arrow { color: var(--color-purple); font-weight: 600; }
+    .vd-ann-remove { background: none; border: none; cursor: pointer; color: var(--color-text-secondary); font-size: 13px; padding: 0 2px; line-height: 1; }
+    .vd-ann-remove:hover { color: var(--color-text-primary); }
+
+    .vd-furigana-popup {
+      position: fixed; background: var(--color-bg);
+      border: 1px solid var(--color-border-md); border-radius: var(--radius-lg);
+      padding: 12px 14px; box-shadow: var(--shadow-lg); z-index: 200; min-width: 260px; display: none;
+    }
+    .vd-popup-label { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 8px; }
+    .vd-popup-label strong { color: var(--color-text-primary); }
+    .vd-popup-row { display: flex; gap: 6px; align-items: center; }
+    .vd-popup-row input {
+      flex: 1; padding: 7px 10px; border-radius: var(--radius-md);
+      border: 1px solid var(--color-border-md); background: var(--color-bg);
+      color: var(--color-text-primary); font-size: 14px; outline: none;
+    }
+    .vd-popup-row input:focus { border-color: var(--color-purple); }
+    .vd-popup-btn-ok {
+      padding: 7px 14px; background: var(--color-purple); color: #fff;
+      border: none; border-radius: var(--radius-md); font-size: 13px; cursor: pointer; white-space: nowrap;
+    }
+    .vd-popup-btn-ok:hover { opacity: 0.88; }
+    .vd-popup-btn-cancel {
+      padding: 7px 10px; background: transparent; color: var(--color-text-secondary);
+      border: 1px solid var(--color-border-md); border-radius: var(--radius-md); font-size: 13px; cursor: pointer;
+    }
+    .vd-popup-btn-cancel:hover { background: var(--color-bg-secondary); }
+
+    .vd-voice-row { display: flex; align-items: center; gap: 8px; margin-bottom: 0.5rem; }
+    .vd-voice-row label { font-size: 13px; color: var(--color-text-secondary); flex-shrink: 0; }
+    #vd-voice-select {
+      flex: 1; padding: 8px 10px; border-radius: var(--radius-md);
+      border: 1px solid var(--color-border-md); background: var(--color-bg);
+      color: var(--color-text-primary); font-size: 13px; outline: none; cursor: pointer;
+    }
+    #vd-voice-select:focus { border-color: var(--color-teal); }
+    .vd-voice-none { font-size: 12px; color: var(--color-text-secondary); font-style: italic; }
+    .vd-voice-hint { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 0.5rem; }
+    .vd-voice-error {
+      font-size: 12px; color: #b45309; background: #fef3c7;
+      border: 1px solid #fcd34d; border-radius: var(--radius-md);
+      padding: 7px 12px; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 6px;
+    }
+    @media (prefers-color-scheme: dark) {
+      .vd-voice-error { color: #fcd34d; background: #2d1f00; border-color: #78450a; }
+    }
+
+    .vd-speed-row { display: flex; align-items: center; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
+    .vd-speed-label { font-size: 13px; color: var(--color-text-secondary); flex-shrink: 0; }
+    .vd-speed-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+    .vd-speed-btn {
+      padding: 6px 14px; border-radius: var(--radius-md);
+      border: 1px solid var(--color-border-md); background: transparent;
+      color: var(--color-text-secondary); font-size: 13px; cursor: pointer;
+    }
+    .vd-speed-btn:hover { background: var(--color-bg); }
+    .vd-speed-btn.active { background: var(--color-teal-bg); color: var(--color-teal); border-color: transparent; font-weight: 600; }
+
+    .vd-voice-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .vd-btn-play {
+      display: flex; align-items: center; gap: 8px; padding: 10px 20px;
+      background: var(--color-teal); color: #fff;
+      border: none; border-radius: var(--radius-md); font-size: 14px; cursor: pointer; font-weight: 600;
+    }
+    .vd-btn-play:hover { opacity: 0.88; }
+    .vd-btn-play:disabled { opacity: 0.4; cursor: not-allowed; }
+    .vd-btn-pause {
+      display: flex; align-items: center; gap: 8px; padding: 10px 20px;
+      background: transparent; color: var(--color-purple);
+      border: 1px solid var(--color-purple); border-radius: var(--radius-md); font-size: 14px; cursor: pointer;
+    }
+    .vd-btn-pause:hover { background: var(--color-purple-bg); }
+    .vd-btn-pause:disabled { opacity: 0.4; cursor: not-allowed; }
+    .vd-status-badge {
+      font-size: 12px; padding: 4px 10px; border-radius: var(--radius-md);
+      background: var(--color-bg); color: var(--color-text-secondary); border: 1px solid var(--color-border);
+    }
+    .vd-status-badge.playing { background: var(--color-teal-bg); color: var(--color-teal); border-color: transparent; }
+    .vd-tip {
+      background: var(--color-bg-info); border-radius: var(--radius-md);
+      padding: 1rem 1.25rem; font-size: 13px; color: var(--color-text-info);
+      display: flex; gap: 10px; align-items: flex-start; margin-top: 1rem;
+    }
+    .vd-tip i { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
 
     /* ---- Sections ---- */
     .section { padding: 3rem 1.5rem; }
@@ -672,27 +793,28 @@
     <div class="section-title">2種類のデモを試してみよう</div>
     <div class="section-sub">練習スタイルに合わせて選べます</div>
     <div class="demo-cards">
-      <div class="demo-card demo-card-active">
+      <button type="button" class="demo-card demo-card-active" id="tab-keyboard" onclick="switchDemo('keyboard')">
         <div class="demo-card-icon"><i class="ti ti-keyboard" aria-hidden="true"></i></div>
         <div class="demo-card-body">
           <div class="demo-card-badge">このページで体験</div>
           <h3>キーボード入力デモ</h3>
           <p>キーワードを入力するとAIが練習文を生成。画面を見ながらタイピング練習できます。</p>
         </div>
-      </div>
-      <a class="demo-card demo-card-link" href="demo-voice.html">
+      </button>
+      <button type="button" class="demo-card demo-card-link" id="tab-voice" onclick="switchDemo('voice')">
         <div class="demo-card-icon voice"><i class="ti ti-volume" aria-hidden="true"></i></div>
         <div class="demo-card-body">
-          <div class="demo-card-badge voice">別ページで体験 →</div>
+          <div class="demo-card-badge voice">このページで体験</div>
           <h3>音声読み上げデモ</h3>
           <p>生成した練習文を音声で読み上げ。<strong>聴きながら入力する</strong>本番さながらの練習ができます。</p>
         </div>
-      </a>
+      </button>
     </div>
   </div>
 
   <!-- Demo -->
-  <div class="demo-box" id="demo">
+  <div id="demo">
+  <div class="demo-box" id="demo-box-keyboard">
     <div class="demo-label">プレビュー — こんな感じで練習できます</div>
     <div class="demo-input-row">
       <input type="text" id="kw-input" placeholder="キーワードを入力（例：要約筆記、人工知能…）" onkeydown="if(event.key==='Enter')generateDemo()" />
@@ -745,6 +867,122 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- 音声読み上げデモ -->
+  <div class="demo-box" id="demo-box-voice" style="display:none">
+    <!-- ふりがな入力ポップアップ -->
+    <div class="vd-furigana-popup" id="vd-furigana-popup">
+      <div class="vd-popup-label">「<strong id="vd-popup-selected-text"></strong>」のふりがな</div>
+      <div class="vd-popup-row">
+        <input type="text" id="vd-furigana-input" placeholder="ひらがなで入力" autocomplete="off" />
+        <button class="vd-popup-btn-ok" onclick="VD.confirmFurigana()">追加</button>
+        <button class="vd-popup-btn-cancel" onclick="VD.hideFuriganaPopup()">×</button>
+      </div>
+    </div>
+
+    <div class="demo-label">プレビュー — 音声を聴きながら練習できます</div>
+    <div class="demo-input-row">
+      <input type="text" id="vd-kw-input" placeholder="キーワードを入力（例：要約筆記、人工知能…）" onkeydown="if(event.key==='Enter')VD.generateText()" />
+      <button id="vd-btn-generate" onclick="VD.generateText()">生成</button>
+    </div>
+    <div class="demo-error" id="vd-demo-error"></div>
+
+    <!-- または：自分の文章 -->
+    <div class="or-row">
+      <div class="or-line"></div>
+      <span class="or-text">または</span>
+      <button class="custom-toggle" onclick="VD.toggleCustomSection()">
+        自分の文章を使う <i class="ti ti-chevron-down" id="vd-custom-toggle-icon"></i>
+      </button>
+      <div class="or-line"></div>
+    </div>
+    <div class="custom-section" id="vd-custom-section" style="display:none">
+      <textarea class="custom-textarea" id="vd-custom-text-input"
+        placeholder="練習したい文章をここに貼り付けてください（500文字以内）"
+        oninput="VD.updateCustomCounter()"></textarea>
+      <div class="custom-footer">
+        <span class="char-counter" id="vd-custom-counter">0 / 500</span>
+        <span class="custom-warning" id="vd-custom-warning" style="display:none">500文字以内にしてください</span>
+        <button class="btn-use-custom" id="vd-btn-use-custom" onclick="VD.useCustomText()" disabled>
+          <i class="ti ti-check" aria-hidden="true"></i> この文章を使う
+        </button>
+      </div>
+    </div>
+
+    <div class="demo-practice-block">
+      <!-- 練習文パネル -->
+      <div class="demo-panel">
+        <div class="demo-panel-label">練習文（読み間違えそうな箇所はドラッグ選択でふりがな追加）</div>
+        <div class="vd-text-box" id="vd-text-box">キーワードを入力して「生成」を押してください。または、「自分の文章を使う」をクリックして、好きな文章を貼り付けてください。読み間違える単語は選択してふりがなを登録できます。</div>
+        <div class="vd-annotation-list" id="vd-annotation-list">
+          <div class="vd-ann-list-label"><i class="ti ti-text-size" aria-hidden="true"></i> ふりがな設定（読み上げ時に反映）</div>
+          <div class="vd-ann-chips" id="vd-annotation-items"></div>
+        </div>
+        <div class="wiki-credit" id="vd-wiki-credit" style="display:none"></div>
+      </div>
+
+      <!-- 音声設定パネル -->
+      <div class="demo-panel">
+        <div class="demo-panel-label">音声設定</div>
+        <div class="vd-voice-row">
+          <label for="vd-voice-select"><i class="ti ti-microphone" aria-hidden="true"></i> 音声</label>
+          <select id="vd-voice-select" onchange="VD.onVoiceChange()">
+            <option>読み込み中…</option>
+          </select>
+          <span class="vd-voice-none" id="vd-voice-none" style="display:none">日本語音声が見つかりません</span>
+        </div>
+        <p class="vd-voice-hint">Chrome は「Google 日本語」、Edge は ☁ マーク付きの「Natural」音声がおすすめです。</p>
+        <p class="vd-voice-error" id="vd-voice-error" style="display:none">
+          <i class="ti ti-alert-triangle"></i> この音声は使用できませんでした。別の音声を選んでください。
+        </p>
+        <div class="vd-speed-row">
+          <span class="vd-speed-label"><i class="ti ti-gauge" aria-hidden="true"></i> 速度</span>
+          <div class="vd-speed-btns">
+            <button class="vd-speed-btn" data-rate="0.5" onclick="VD.setSpeed(this)">遅い</button>
+            <button class="vd-speed-btn active" data-rate="0.7" onclick="VD.setSpeed(this)">やや遅い</button>
+            <button class="vd-speed-btn" data-rate="0.9" onclick="VD.setSpeed(this)">ふつう</button>
+            <button class="vd-speed-btn" data-rate="1.1" onclick="VD.setSpeed(this)">やや速い</button>
+          </div>
+        </div>
+        <div class="vd-voice-controls">
+          <button class="vd-btn-play" id="vd-btn-play" onclick="VD.startSpeech()" disabled>
+            <i class="ti ti-player-play" aria-hidden="true"></i> 読み上げ開始
+          </button>
+          <button class="vd-btn-pause" id="vd-btn-pause" onclick="VD.togglePauseSpeech()" disabled>
+            <i class="ti ti-player-pause" aria-hidden="true"></i> 一時停止
+          </button>
+          <span class="vd-status-badge" id="vd-status-badge">待機中</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="demo-practice-block">
+      <!-- 入力パネル -->
+      <div class="demo-panel">
+        <div class="demo-panel-label">入力（Enterで終了）</div>
+        <div class="demo-result" id="vd-result"></div>
+        <textarea id="vd-typing-box" placeholder="ここに入力（生成後に入力できます）" rows="5" disabled oninput="VD.updateStats()"></textarea>
+        <div class="demo-stats">
+          <div class="demo-stat" id="vd-s-chars"><div class="val" id="vd-stat-chars">0 / 0</div><div class="lbl">入力文字数／文字数</div></div>
+          <div class="demo-stat" id="vd-s-rate"><div class="val" id="vd-stat-rate">—</div><div class="lbl">文字包含率</div></div>
+          <div class="demo-stat" id="vd-s-wpm"><div class="val" id="vd-stat-wpm">—</div><div class="lbl">文字/分</div></div>
+          <div class="demo-stat" id="vd-s-time"><div class="val" id="vd-stat-time">0:00</div><div class="lbl">経過時間</div></div>
+        </div>
+        <div class="demo-buttons">
+          <button class="demo-btn" id="vd-btn-retry"  onclick="VD.retryTyping()" disabled>再挑戦</button>
+          <button class="demo-btn" id="vd-btn-new"    onclick="VD.newQuestion()" disabled>新しい問題</button>
+          <button class="demo-btn" id="vd-btn-finish" onclick="VD.finishTyping()" disabled>入力終了</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tip -->
+    <div class="vd-tip">
+      <i class="ti ti-info-circle" aria-hidden="true"></i>
+      <span>音声読み上げにはブラウザ内蔵の音声合成を使用しています。要約筆記の本番練習に近い環境が作れます。速度は読み上げ前に選んでください。<br><br>「文字包含率」は、入力した各文字が問題文に何文字含まれているかを重複込みでカウントして評価しています。順番は問わないため、キーワードをどれだけ拾えたかの目安になります。</span>
+    </div>
+  </div>
   </div>
 
   <!-- Problems -->
@@ -1173,6 +1411,560 @@
     document.getElementById('custom-section').style.display = 'none';
     document.getElementById('custom-toggle-icon').className = 'ti ti-chevron-down';
   }
+
+  /* ===== デモ切り替え（キーボード入力 / 音声読み上げ） ===== */
+  function switchDemo(type) {
+    const showVoice = type === 'voice';
+    document.getElementById('demo-box-keyboard').style.display = showVoice ? 'none' : '';
+    document.getElementById('demo-box-voice').style.display = showVoice ? '' : 'none';
+    document.getElementById('tab-keyboard').classList.toggle('demo-card-active', !showVoice);
+    document.getElementById('tab-voice').classList.toggle('demo-card-active', showVoice);
+    if (!showVoice) VD.stopSpeech();
+  }
+</script>
+
+<script>
+/* ===== 音声読み上げデモ（VD 名前空間にまとめてキーボードデモと衝突しないようにする） ===== */
+const VD = (function () {
+  let currentText = '';
+  let currentRate = 0.7;
+  let startTime = null;
+  let timerInterval = null;
+  let finished = false;
+  let jaVoices = [];
+  let annotations = [];   // [{start, end, reading}]
+  let pendingAnn = null;  // {start, end, text} — 確定前の選択
+  let isPaused = false;
+  const MAX_CUSTOM = 500;
+
+  /* ---- 音声一覧 ---- */
+  function loadVoices() {
+    const all = window.speechSynthesis.getVoices();
+    jaVoices = all.filter(v => v.lang.startsWith('ja'));
+    const sel = document.getElementById('vd-voice-select');
+    const none = document.getElementById('vd-voice-none');
+    if (jaVoices.length === 0) {
+      sel.style.display = 'none'; none.style.display = 'inline'; return;
+    }
+    sel.style.display = ''; none.style.display = 'none';
+    sel.innerHTML = '';
+    jaVoices.forEach((v, i) => {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = v.name + (v.localService ? '' : ' ☁');
+      sel.appendChild(opt);
+    });
+  }
+  function onVoiceChange() {
+    if (window.speechSynthesis.speaking) startSpeech();
+  }
+  speechSynthesis.onvoiceschanged = loadVoices;
+  loadVoices();
+
+  /* ---- Wikipedia API ---- */
+  async function generateText() {
+    const kw = document.getElementById('vd-kw-input').value.trim();
+    if (!kw) return;
+
+    const btn    = document.getElementById('vd-btn-generate');
+    const errBox = document.getElementById('vd-demo-error');
+    const credit = document.getElementById('vd-wiki-credit');
+
+    btn.innerHTML = '取得中…'; btn.disabled = true;
+    errBox.style.display = 'none'; credit.style.display = 'none';
+    document.getElementById('vd-text-box').textContent = 'Wikipediaから記事を取得しています…';
+    stopSpeech(); clearAnnotations();
+
+    try {
+      const result = await fetchWikipedia(kw);
+      currentText = result.text;
+      annotations = [];
+      resetStats();
+      renderTextWithAnnotations();
+
+      const note = result.redirected
+        ? '「' + kw + '」→「' + result.title + '」にリダイレクト&ensp;|&ensp;' : '';
+      credit.innerHTML = note + '出典: <a href="https://ja.wikipedia.org/wiki/'
+        + encodeURIComponent(result.title) + '" target="_blank" rel="noopener">Wikipedia「'
+        + result.title + '」</a>';
+      credit.style.display = 'block';
+
+      document.getElementById('vd-btn-play').disabled   = false;
+      document.getElementById('vd-btn-retry').disabled  = false;
+      document.getElementById('vd-btn-new').disabled    = false;
+      document.getElementById('vd-btn-finish').disabled = false;
+      const box = document.getElementById('vd-typing-box');
+      box.value = '';
+      box.disabled = false;
+    } catch (e) {
+      errBox.textContent = e.message; errBox.style.display = 'block';
+      document.getElementById('vd-text-box').textContent = 'キーワードを入力して「生成」を押してください。または、「自分の文章を使う」をクリックして、好きな文章を貼り付けてください。読み間違える単語は選択してふりがなを登録できます。';
+    } finally {
+      btn.innerHTML = '生成'; btn.disabled = false;
+    }
+  }
+
+  async function fetchWikipedia(keyword) {
+    const result = await fetchPage(keyword);
+    if (!result) throw new Error('「' + keyword + '」の文章が取得できませんでした。別のキーワードを試してください。');
+    return result;
+  }
+
+  async function fetchPage(title) {
+    const url = 'https://ja.wikipedia.org/w/api.php?action=query'
+      + '&titles=' + encodeURIComponent(title)
+      + '&prop=extracts&exintro=true&exsentences=4&redirects=1&format=json&origin=*';
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('ネットワークエラーが発生しました。');
+    const data = await res.json();
+    const page = Object.values(data.query.pages)[0];
+    if (page.missing !== undefined) return null;
+    const redirected = page.title !== title;
+    const div = document.createElement('div');
+    div.innerHTML = page.extract;
+    let text = (div.textContent || '').replace(/\s+/g, ' ').trim();
+    text = text.replace(/（[^）]*）/g, '');
+    text = text.replace(/\(/g, '（').replace(/\)/g, '）');
+    text = text.replace(/（[^）]*）/g, '');
+    text = text.replace(/!/g, '！').replace(/\?/g, '？');
+    text = text.replace(/([^\x00-\x7F])\s+([^\x00-\x7F])/g, '$1$2');
+    text = text.replace(/\s+/g, ' ').trim();
+    if (text.replace(/[。、\s]/g, '').length < 15) return null;
+    if (text.length > 250) {
+      const cut = text.indexOf('。', 100);
+      text = cut !== -1 && cut < 280 ? text.slice(0, cut + 1) : text.slice(0, 200) + '。';
+    }
+    if (!text.endsWith('。')) text += '。';
+    return { text, title: page.title, redirected };
+  }
+
+  /* ---- テキスト表示（ルビ付き） ---- */
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function renderTextWithAnnotations() {
+    if (!currentText) return;
+    const sorted = [...annotations].sort((a, b) => a.start - b.start);
+    let html = '', pos = 0;
+    for (const ann of sorted) {
+      for (let i = pos; i < ann.start; i++)
+        html += '<span class="char-span" data-pos="' + i + '">' + esc(currentText[i]) + '</span>';
+      html += '<ruby>'
+        + '<span class="annotated-text" data-ann-s="' + ann.start + '" data-ann-e="' + ann.end + '">'
+        + esc(currentText.slice(ann.start, ann.end))
+        + '</span><rt>' + esc(ann.reading) + '</rt></ruby>';
+      pos = ann.end;
+    }
+    for (let i = pos; i < currentText.length; i++)
+      html += '<span class="char-span" data-pos="' + i + '">' + esc(currentText[i]) + '</span>';
+    document.getElementById('vd-text-box').innerHTML = html;
+  }
+
+  function resetTextDisplay() {
+    renderTextWithAnnotations();
+  }
+
+  /* ---- 読み上げ進捗ハイライト（ふりがななし時のみ） ---- */
+  function renderProgress(charIndex, charLen) {
+    if (annotations.length > 0) return;
+    const t = currentText;
+    const end = Math.min(charIndex + (charLen || 1), t.length);
+    document.getElementById('vd-text-box').innerHTML =
+      '<span class="spoken">'   + esc(t.slice(0, charIndex)) + '</span>' +
+      '<span class="speaking">' + esc(t.slice(charIndex, end)) + '</span>' +
+      '<span class="unspoken">' + esc(t.slice(end)) + '</span>';
+  }
+
+  /* ---- ふりがな入力：選択検出 ---- */
+  function handleTextSelection() {
+    const sel = window.getSelection();
+    if (!sel || sel.isCollapsed || !sel.toString().trim()) return;
+
+    const range = sel.getRangeAt(0);
+    const textBox = document.getElementById('vd-text-box');
+    if (!textBox.contains(range.commonAncestorContainer)) return;
+
+    let startPos = Infinity, endPos = -1;
+
+    textBox.querySelectorAll('.char-span').forEach(span => {
+      try {
+        if (range.intersectsNode(span)) {
+          const p = parseInt(span.dataset.pos);
+          if (p < startPos) startPos = p;
+          if (p > endPos) endPos = p;
+        }
+      } catch(_) {}
+    });
+
+    textBox.querySelectorAll('.annotated-text').forEach(span => {
+      try {
+        if (range.intersectsNode(span)) {
+          const s = parseInt(span.dataset.annS);
+          const e = parseInt(span.dataset.annE);
+          if (s < startPos) startPos = s;
+          if (e - 1 > endPos) endPos = e - 1;
+        }
+      } catch(_) {}
+    });
+
+    if (startPos === Infinity || endPos === -1) return;
+
+    const selectedText = currentText.slice(startPos, endPos + 1);
+    const rect = range.getBoundingClientRect();
+    pendingAnn = { start: startPos, end: endPos + 1, text: selectedText };
+    showFuriganaPopup(selectedText, rect);
+  }
+
+  function showFuriganaPopup(selectedText, rect) {
+    document.getElementById('vd-popup-selected-text').textContent = selectedText;
+    document.getElementById('vd-furigana-input').value = '';
+    const popup = document.getElementById('vd-furigana-popup');
+    popup.style.display = 'block';
+    const top = rect.bottom + 8;
+    const left = Math.min(rect.left, window.innerWidth - 280);
+    popup.style.top = Math.max(8, top) + 'px';
+    popup.style.left = Math.max(8, left) + 'px';
+    setTimeout(() => document.getElementById('vd-furigana-input').focus(), 30);
+  }
+
+  function hideFuriganaPopup() {
+    document.getElementById('vd-furigana-popup').style.display = 'none';
+    pendingAnn = null;
+    window.getSelection()?.removeAllRanges();
+  }
+
+  function confirmFurigana() {
+    const reading = document.getElementById('vd-furigana-input').value.trim();
+    if (!reading || !pendingAnn) { hideFuriganaPopup(); return; }
+    annotations = annotations.filter(a => a.end <= pendingAnn.start || a.start >= pendingAnn.end);
+    annotations.push({ start: pendingAnn.start, end: pendingAnn.end, reading });
+    hideFuriganaPopup();
+    renderTextWithAnnotations();
+    renderAnnotationList();
+  }
+
+  function removeAnnotationByCoords(start, end) {
+    annotations = annotations.filter(a => !(a.start === start && a.end === end));
+    renderTextWithAnnotations();
+    renderAnnotationList();
+  }
+
+  function renderAnnotationList() {
+    const list = document.getElementById('vd-annotation-list');
+    const items = document.getElementById('vd-annotation-items');
+    if (annotations.length === 0) { list.style.display = 'none'; return; }
+    list.style.display = 'block';
+    const sorted = [...annotations].sort((a, b) => a.start - b.start);
+    items.innerHTML = sorted.map(ann =>
+      '<span class="vd-ann-chip">'
+      + esc(currentText.slice(ann.start, ann.end))
+      + '<span class="vd-ann-arrow"> → </span>'
+      + esc(ann.reading)
+      + ' <button class="vd-ann-remove" onclick="VD.removeAnnotationByCoords('
+      + ann.start + ',' + ann.end + ')">×</button>'
+      + '</span>'
+    ).join('');
+  }
+
+  function clearAnnotations() {
+    annotations = [];
+    document.getElementById('vd-annotation-list').style.display = 'none';
+    document.getElementById('vd-annotation-items').innerHTML = '';
+  }
+
+  /* ---- TTS テキスト（ふりがなを置換） ---- */
+  function buildTTSText() {
+    if (annotations.length === 0) return currentText;
+    const sorted = [...annotations].sort((a, b) => a.start - b.start);
+    let result = '', pos = 0;
+    for (const ann of sorted) {
+      result += currentText.slice(pos, ann.start);
+      result += ann.reading;
+      pos = ann.end;
+    }
+    result += currentText.slice(pos);
+    return result;
+  }
+
+  /* ---- 速度ボタン ---- */
+  function setSpeed(btn) {
+    currentRate = parseFloat(btn.dataset.rate);
+    document.querySelectorAll('.vd-speed-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if (window.speechSynthesis.speaking) startSpeech();
+  }
+
+  /* ---- 音声読み上げ ---- */
+  function startSpeech() {
+    if (!currentText) return;
+    stopSpeech();
+
+    const ttsText = buildTTSText();
+    const utterance = new SpeechSynthesisUtterance(ttsText);
+    utterance.lang = 'ja-JP';
+    utterance.rate = currentRate;
+    const voiceIdx = parseInt(document.getElementById('vd-voice-select').value);
+    if (jaVoices[voiceIdx]) utterance.voice = jaVoices[voiceIdx];
+
+    utterance.onboundary = (e) => {
+      if (e.name === 'word' || e.name === 'sentence') renderProgress(e.charIndex, e.charLength);
+    };
+    utterance.onstart = () => {
+      setStatus(true);
+      document.getElementById('vd-btn-pause').disabled = false;
+      document.getElementById('vd-voice-error').style.display = 'none';
+    };
+    utterance.onend = () => {
+      setStatus(false);
+      isPaused = false;
+      document.getElementById('vd-btn-pause').disabled = true;
+      updatePauseButton();
+      resetTextDisplay();
+    };
+    utterance.onerror = (e) => {
+      if (e.error === 'canceled' || e.error === 'interrupted') return;
+      setStatus(false);
+      resetTextDisplay();
+      document.getElementById('vd-voice-error').style.display = 'flex';
+    };
+
+    window.speechSynthesis.speak(utterance);
+  }
+
+  function stopSpeech() {
+    window.speechSynthesis.cancel();
+    isPaused = false;
+    const pauseBtn = document.getElementById('vd-btn-pause');
+    if (pauseBtn) pauseBtn.disabled = true;
+    updatePauseButton();
+    setStatus(false);
+    resetTextDisplay();
+  }
+
+  function togglePauseSpeech() {
+    if (!window.speechSynthesis.speaking && !window.speechSynthesis.paused) return;
+    if (isPaused) {
+      window.speechSynthesis.resume();
+      isPaused = false;
+    } else {
+      window.speechSynthesis.pause();
+      isPaused = true;
+    }
+    updatePauseButton();
+  }
+
+  function updatePauseButton() {
+    const btn = document.getElementById('vd-btn-pause');
+    if (!btn) return;
+    btn.innerHTML = isPaused
+      ? '<i class="ti ti-player-play"></i> 続きを再開'
+      : '<i class="ti ti-player-pause"></i> 一時停止';
+  }
+
+  function setStatus(playing) {
+    const badge = document.getElementById('vd-status-badge');
+    const btn   = document.getElementById('vd-btn-play');
+    if (playing) {
+      badge.textContent = annotations.length > 0 ? '読み上げ中（ふりがな反映）' : '読み上げ中';
+      badge.classList.add('playing');
+      btn.innerHTML = '<i class="ti ti-player-play"></i> 読み上げ中…';
+    } else {
+      badge.textContent = '待機中';
+      badge.classList.remove('playing');
+      btn.innerHTML = '<i class="ti ti-player-play"></i> 読み上げ開始';
+    }
+  }
+
+  /* ---- 再挑戦 ---- */
+  function retryTyping() {
+    stopSpeech(); resetStats();
+    const box = document.getElementById('vd-typing-box');
+    box.value = '';
+    box.focus();
+  }
+
+  /* ---- 新しい問題 ---- */
+  function newQuestion() {
+    stopSpeech(); clearAnnotations();
+    currentText = '';
+    resetStats();
+    const box = document.getElementById('vd-typing-box');
+    box.value = '';
+    box.disabled = true;
+    document.getElementById('vd-text-box').textContent = 'キーワードを入力して「生成」を押してください。または、「自分の文章を使う」をクリックして、好きな文章を貼り付けてください。読み間違える単語は選択してふりがなを登録できます。';
+    document.getElementById('vd-wiki-credit').style.display = 'none';
+    document.getElementById('vd-demo-error').style.display = 'none';
+    document.getElementById('vd-btn-play').disabled = true;
+    document.getElementById('vd-btn-retry').disabled = true;
+    document.getElementById('vd-btn-new').disabled = true;
+    document.getElementById('vd-btn-finish').disabled = true;
+    document.getElementById('vd-kw-input').value = '';
+    document.getElementById('vd-kw-input').focus();
+    document.getElementById('vd-custom-text-input').value = '';
+    document.getElementById('vd-custom-counter').textContent = '0 / 500';
+    document.getElementById('vd-custom-counter').classList.remove('over');
+    document.getElementById('vd-custom-warning').style.display = 'none';
+    document.getElementById('vd-btn-use-custom').disabled = true;
+    document.getElementById('vd-custom-section').style.display = 'none';
+    document.getElementById('vd-custom-toggle-icon').className = 'ti ti-chevron-down';
+  }
+
+  /* ---- 入力終了 ---- */
+  function finishTyping() {
+    if (finished || !startTime) return;
+    finished = true;
+    clearInterval(timerInterval);
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    const typed = document.getElementById('vd-typing-box').value;
+    const chars = typed.length;
+    const rate = currentText.length > 0 ? calcInclusion(typed, currentText) + '%' : '—';
+    const wpm = elapsed > 0 ? Math.round(chars / (elapsed / 60)) : 0;
+    document.getElementById('vd-stat-chars').textContent = chars + ' / ' + currentText.length;
+    document.getElementById('vd-stat-rate').textContent = rate;
+    document.getElementById('vd-stat-wpm').textContent = wpm;
+    document.getElementById('vd-stat-time').textContent = fmt(elapsed);
+    ['vd-s-chars', 'vd-s-rate', 'vd-s-wpm', 'vd-s-time'].forEach(id => {
+      document.getElementById(id).classList.add('finished');
+    });
+    const result = document.getElementById('vd-result');
+    result.textContent = `完了！ ${fmt(elapsed)} で ${chars} 文字入力しました。`;
+    result.style.display = 'block';
+    document.getElementById('vd-btn-finish').disabled = true;
+    document.getElementById('vd-btn-finish').innerHTML = '<i class="ti ti-check"></i> 終了しました';
+  }
+
+  /* ---- タイマー・統計 ---- */
+  function startTimer() {
+    finished = false; startTime = Date.now();
+    timerInterval = setInterval(() => {
+      if (finished) return;
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      document.getElementById('vd-stat-time').textContent = fmt(elapsed);
+      const typed = document.getElementById('vd-typing-box').value;
+      const len = typed.length;
+      if (len > 0 && elapsed > 0)
+        document.getElementById('vd-stat-wpm').textContent = Math.round(len / (elapsed / 60));
+      if (currentText.length > 0)
+        document.getElementById('vd-stat-rate').textContent = calcInclusion(typed, currentText) + '%';
+    }, 1000);
+  }
+
+  function resetStats() {
+    clearInterval(timerInterval); startTime = null; finished = false;
+    document.getElementById('vd-stat-chars').textContent = '0 / ' + (currentText.length || 0);
+    document.getElementById('vd-stat-rate').textContent = '—';
+    document.getElementById('vd-stat-wpm').textContent = '—';
+    document.getElementById('vd-stat-time').textContent = '0:00';
+    ['vd-s-chars', 'vd-s-rate', 'vd-s-wpm', 'vd-s-time'].forEach(id =>
+      document.getElementById(id).classList.remove('finished'));
+    document.getElementById('vd-result').style.display = 'none';
+    const finBtn = document.getElementById('vd-btn-finish');
+    finBtn.disabled = false;
+    finBtn.innerHTML = '入力終了';
+  }
+
+  function updateStats() {
+    if (finished) return;
+    if (!startTime) startTimer();
+    const typed = document.getElementById('vd-typing-box').value;
+    document.getElementById('vd-stat-chars').textContent = typed.length + ' / ' + currentText.length;
+    if (currentText.length > 0)
+      document.getElementById('vd-stat-rate').textContent = calcInclusion(typed, currentText) + '%';
+  }
+
+  /* ---- 文字包含率 ---- */
+  function calcInclusion(typed, source) {
+    if (!source.length) return 0;
+    const srcMap = {};
+    for (const ch of source) srcMap[ch] = (srcMap[ch] || 0) + 1;
+    const cntMap = {};
+    let matched = 0;
+    for (const ch of typed) {
+      cntMap[ch] = (cntMap[ch] || 0) + 1;
+      if (cntMap[ch] <= (srcMap[ch] || 0)) matched++;
+    }
+    return Math.round(matched / source.length * 100);
+  }
+
+  function fmt(sec) {
+    return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
+  }
+
+  /* ---- 自分の文章 ---- */
+  function toggleCustomSection() {
+    const section = document.getElementById('vd-custom-section');
+    const icon = document.getElementById('vd-custom-toggle-icon');
+    const isOpen = section.style.display !== 'none';
+    section.style.display = isOpen ? 'none' : 'block';
+    icon.className = isOpen ? 'ti ti-chevron-down' : 'ti ti-chevron-up';
+  }
+
+  function updateCustomCounter() {
+    const len = document.getElementById('vd-custom-text-input').value.length;
+    const counter = document.getElementById('vd-custom-counter');
+    const warning = document.getElementById('vd-custom-warning');
+    counter.textContent = len + ' / ' + MAX_CUSTOM;
+    const over = len > MAX_CUSTOM;
+    counter.classList.toggle('over', over);
+    warning.style.display = over ? 'inline' : 'none';
+    document.getElementById('vd-btn-use-custom').disabled = over || len === 0;
+  }
+
+  function useCustomText() {
+    const text = document.getElementById('vd-custom-text-input').value.trim();
+    if (!text || text.length > MAX_CUSTOM) return;
+
+    stopSpeech();
+    clearAnnotations();
+
+    currentText = text;
+    resetStats();
+    renderTextWithAnnotations();
+    document.getElementById('vd-wiki-credit').style.display = 'none';
+    document.getElementById('vd-demo-error').style.display = 'none';
+
+    document.getElementById('vd-btn-play').disabled = false;
+    document.getElementById('vd-btn-retry').disabled = false;
+    document.getElementById('vd-btn-new').disabled = false;
+    document.getElementById('vd-btn-finish').disabled = false;
+    const box = document.getElementById('vd-typing-box');
+    box.value = '';
+    box.disabled = false;
+
+    document.getElementById('vd-custom-section').style.display = 'none';
+    document.getElementById('vd-custom-toggle-icon').className = 'ti ti-chevron-down';
+  }
+
+  /* ---- イベント登録 ---- */
+  document.getElementById('vd-text-box').addEventListener('mouseup', function() {
+    setTimeout(handleTextSelection, 10);
+  });
+
+  document.getElementById('vd-typing-box').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); finishTyping(); }
+  });
+
+  document.getElementById('vd-furigana-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') confirmFurigana();
+    if (e.key === 'Escape') hideFuriganaPopup();
+  });
+
+  document.addEventListener('mousedown', function(e) {
+    const popup = document.getElementById('vd-furigana-popup');
+    if (popup.style.display === 'none') return;
+    if (!popup.contains(e.target) && !document.getElementById('vd-text-box').contains(e.target)) {
+      hideFuriganaPopup();
+    }
+  });
+
+  return {
+    generateText, onVoiceChange, setSpeed, startSpeech, stopSpeech, togglePauseSpeech,
+    retryTyping, newQuestion, finishTyping, updateStats,
+    toggleCustomSection, updateCustomCounter, useCustomText,
+    confirmFurigana, hideFuriganaPopup, removeAnnotationByCoords
+  };
+})();
 </script>
 
 </body>
