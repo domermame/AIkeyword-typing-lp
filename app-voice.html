@@ -275,6 +275,14 @@
     }
     .btn-play:hover { opacity: 0.88; }
     .btn-play:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-pause {
+      display: flex; align-items: center; gap: 8px; padding: 10px 20px;
+      background: transparent; color: var(--color-purple);
+      border: 0.5px solid var(--color-purple); border-radius: var(--radius-md);
+      font-size: 14px; font-family: inherit; cursor: pointer;
+    }
+    .btn-pause:hover { background: var(--color-purple-bg); }
+    .btn-pause:disabled { opacity: 0.4; cursor: not-allowed; }
     .btn-stop {
       display: flex; align-items: center; gap: 8px; padding: 10px 20px;
       background: transparent; color: var(--color-text-secondary);
@@ -634,7 +642,10 @@
           <button class="btn-play" id="btn-play" onclick="startSpeech()" disabled>
             <i class="ti ti-player-play"></i> 読み上げ開始
           </button>
-          <button class="btn-stop" onclick="stopSpeech()">
+          <button class="btn-pause" id="btn-pause" onclick="togglePauseSpeech()" disabled>
+            <i class="ti ti-player-pause"></i> 一時停止
+          </button>
+          <button class="btn-stop" onclick="retryTyping()">
             <i class="ti ti-player-stop"></i> 停止
           </button>
           <span class="status-badge" id="status-badge">待機中</span>
@@ -1000,6 +1011,8 @@
   };
 
   /* ── 読み上げ ── */
+  let isPaused = false;
+
   function startSpeech() {
     if (!currentText) return;
     stopSpeech();
@@ -1014,10 +1027,19 @@
     };
     utterance.onstart = () => {
       setStatus(true);
+      document.getElementById('btn-pause').disabled = false;
       document.getElementById('voice-error').style.display = 'none';
     };
-    utterance.onend   = () => { setStatus(false); renderTextWithAnnotations(); };
-    utterance.onerror = () => {
+    utterance.onend   = () => {
+      setStatus(false);
+      isPaused = false;
+      document.getElementById('btn-pause').disabled = true;
+      updatePauseButton();
+      renderTextWithAnnotations();
+    };
+    utterance.onerror = (e) => {
+      // stopSpeech()やページ遷移によるキャンセルは意図した停止なのでエラー表示しない
+      if (e.error === 'canceled' || e.error === 'interrupted') return;
       setStatus(false); renderTextWithAnnotations();
       document.getElementById('voice-error').style.display = 'flex';
     };
@@ -1027,10 +1049,34 @@
 
   function stopSpeech() {
     window.speechSynthesis.cancel();
+    isPaused = false;
+    document.getElementById('btn-pause').disabled = true;
+    updatePauseButton();
     setStatus(false);
     if (currentText) renderTextWithAnnotations();
   }
   window.stopSpeech = stopSpeech;
+
+  /* ── 一時停止・続きを再開 ── */
+  window.togglePauseSpeech = function() {
+    if (!window.speechSynthesis.speaking && !window.speechSynthesis.paused) return;
+    if (isPaused) {
+      window.speechSynthesis.resume();
+      isPaused = false;
+    } else {
+      window.speechSynthesis.pause();
+      isPaused = true;
+    }
+    updatePauseButton();
+  };
+
+  function updatePauseButton() {
+    const btn = document.getElementById('btn-pause');
+    if (!btn) return;
+    btn.innerHTML = isPaused
+      ? '<i class="ti ti-player-play"></i> 続きを再開'
+      : '<i class="ti ti-player-pause"></i> 一時停止';
+  }
 
   function setStatus(playing) {
     const badge = document.getElementById('status-badge');
