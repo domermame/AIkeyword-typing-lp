@@ -408,6 +408,15 @@
     .history-date { color: var(--color-text-secondary); white-space: nowrap; }
     .history-num { text-align: right; font-variant-numeric: tabular-nums; }
     .history-cpm { font-weight: 500; color: var(--color-purple); }
+    .history-action { text-align: center; }
+    .history-retry-btn {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 10px; font-size: 12px; font-family: inherit; white-space: nowrap;
+      background: none; border: 0.5px solid var(--color-purple); color: var(--color-purple);
+      border-radius: var(--radius-md); cursor: pointer;
+    }
+    .history-retry-btn:hover { background: var(--color-purple-bg); }
+    .history-no-retry { color: var(--color-text-secondary); font-size: 12px; }
     .kw-cell { display: flex; align-items: center; gap: 4px; }
     .kw-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }
     .kw-edit-btn {
@@ -543,6 +552,7 @@
             <th style="text-align:right">文字数</th>
             <th style="text-align:right">文字/分</th>
             <th style="text-align:right">時間</th>
+            <th style="text-align:center">操作</th>
           </tr>
         </thead>
         <tbody id="history-body"></tbody>
@@ -571,8 +581,8 @@
   import { getAuth, onAuthStateChanged, signOut }
     from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
   import {
-    getFirestore, collection, addDoc, doc, updateDoc, query,
-    orderBy, limit, getDocs, serverTimestamp
+    getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, deleteField, query,
+    where, orderBy, limit, getDocs, serverTimestamp
   } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
   /* ── Firebase 初期化 ── */
@@ -911,6 +921,23 @@
     document.getElementById('custom-toggle-icon').className = 'ti ti-chevron-down';
   };
 
+  /* ── 履歴からもう一度 ── */
+  window.retryFromHistory = function(btn) {
+    const text = btn.dataset.text;
+    const kw   = btn.dataset.kw;
+    if (!text) return;
+    resetTimer();
+    finished = false;
+    paused   = false;
+    currentKw   = kw;
+    currentText = text;
+    document.getElementById('demo-error').style.display = 'none';
+    document.getElementById('wiki-credit').style.display = 'none';
+    document.getElementById('kw-input').value = '';
+    startPractice();
+    document.querySelector('.practice-box').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   /* ────────── Firestore ────────── */
 
   async function saveRecord(keyword, text, chars, elapsed, cpm) {
@@ -923,6 +950,7 @@
       await addDoc(ref, {
         mode: 'keyboard',
         keyword,
+        text,
         chars,
         elapsed,
         cpm,
@@ -931,8 +959,34 @@
       statusEl.textContent = '✓ 記録を保存しました';
       loadHistory();
       loadGrowthChart();
+      trimOldRecords('keyboard');
     } catch (e) {
       statusEl.textContent = '保存に失敗しました（' + e.message + '）';
+    }
+  }
+
+  /* ── 古い記録の整理 ──
+     ・201件目以降は完全に削除
+     ・21〜200件目は文章データ（text）だけ削除してデータ量を減らす
+     （練習履歴は直近10件しか表示しないので、文章は直近20件残せば十分） */
+  async function trimOldRecords(mode) {
+    if (!currentUser) return;
+    try {
+      const ref  = collection(db, 'users', currentUser.uid, 'records');
+      const q    = query(ref, where('mode', '==', mode), orderBy('createdAt', 'desc'), limit(205));
+      const snap = await getDocs(q);
+      const docs = snap.docs;
+
+      for (const d of docs.slice(200)) {
+        await deleteDoc(d.ref);
+      }
+      for (const d of docs.slice(20, 200)) {
+        if (d.data().text !== undefined) {
+          await updateDoc(d.ref, { text: deleteField() });
+        }
+      }
+    } catch (e) {
+      console.error('古い記録の整理に失敗:', e);
     }
   }
 
@@ -1049,6 +1103,9 @@
           <td class="history-num">${d.chars ?? '—'}</td>
           <td class="history-num history-cpm">${d.cpm ?? '—'}</td>
           <td class="history-num">${elapsed}</td>
+          <td class="history-action">${d.text
+            ? `<button class="history-retry-btn" onclick="retryFromHistory(this)" data-text="${escHtml(d.text)}" data-kw="${escHtml(d.keyword)}"><i class="ti ti-repeat"></i> もう一度</button>`
+            : '<span class="history-no-retry">—</span>'}</td>
         `;
         tbody.appendChild(tr);
       });
