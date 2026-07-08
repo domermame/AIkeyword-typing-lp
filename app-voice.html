@@ -424,6 +424,7 @@
       gap: 6px;
     }
     .growth-header i { color: var(--color-purple); }
+    .growth-header-note { font-size: 11px; font-weight: 400; color: var(--color-text-secondary); }
     .growth-empty {
       padding: 2rem 1.25rem;
       text-align: center;
@@ -680,6 +681,7 @@
     <div class="growth-box">
       <div class="growth-header">
         <i class="ti ti-chart-line"></i> 成長グラフ（日別の平均）
+        <span class="growth-header-note">（直近200件の記録が対象）</span>
       </div>
       <div class="growth-empty" id="growth-empty">練習の記録が2件以上たまるとグラフが表示されます。</div>
       <div class="growth-chart-wrap" id="growth-chart-wrap" style="display:none">
