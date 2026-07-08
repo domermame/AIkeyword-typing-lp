@@ -467,6 +467,15 @@
     .history-table tr:last-child td { border-bottom: none; }
     .history-table tr:hover td { background: var(--color-bg-secondary); }
     .history-keyword { max-width: 150px; }
+    .history-action { text-align: center; }
+    .history-retry-btn {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 10px; font-size: 12px; font-family: inherit; white-space: nowrap;
+      background: none; border: 0.5px solid var(--color-teal); color: var(--color-teal);
+      border-radius: var(--radius-md); cursor: pointer;
+    }
+    .history-retry-btn:hover { background: var(--color-teal-bg); }
+    .history-no-retry { color: var(--color-text-secondary); font-size: 12px; }
     .kw-cell { display: flex; align-items: center; gap: 4px; }
     .kw-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }
     .kw-edit-btn {
@@ -671,6 +680,7 @@
             <th style="text-align:right">文字包含率</th>
             <th style="text-align:right">文字/分</th>
             <th style="text-align:right">時間</th>
+            <th style="text-align:center">操作</th>
           </tr>
         </thead>
         <tbody id="history-body"></tbody>
@@ -1088,7 +1098,7 @@
     finBtn.disabled = true;
     finBtn.innerHTML = '<i class="ti ti-check"></i> 終了しました';
 
-    saveRecord(currentKw || '自分の文章', chars, elapsed, cpm, inc);
+    saveRecord(currentKw || '自分の文章', currentText, chars, elapsed, cpm, inc);
   };
 
   /* ── タイマー・統計 ── */
@@ -1192,6 +1202,26 @@
     document.getElementById('custom-toggle-icon').className = 'ti ti-chevron-down';
   };
 
+  /* ── 履歴からもう一度 ── */
+  window.retryFromHistory = function(btn) {
+    const text = btn.dataset.text;
+    const kw   = btn.dataset.kw;
+    if (!text) return;
+    stopSpeech(); resetStats(); clearAnnotations();
+    currentText = text; currentKw = kw;
+    renderTextWithAnnotations();
+    document.getElementById('furigana-hint').classList.add('visible');
+    document.getElementById('wiki-credit').style.display = 'none';
+    document.getElementById('demo-error').style.display = 'none';
+    document.getElementById('btn-play').disabled   = false;
+    document.getElementById('btn-retry').disabled  = false;
+    document.getElementById('btn-new').disabled    = false;
+    document.getElementById('btn-finish').disabled = false;
+    document.getElementById('typing-box').value    = '';
+    document.getElementById('kw-input').value      = '';
+    document.getElementById('text-box').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+
   /* ── キーボード操作 ── */
   document.getElementById('typing-box').addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); window.finishTyping(); }
@@ -1209,7 +1239,7 @@
 
   /* ────────── Firestore ────────── */
 
-  async function saveRecord(keyword, chars, elapsed, cpm, inclusion) {
+  async function saveRecord(keyword, text, chars, elapsed, cpm, inclusion) {
     if (!currentUser) return;
     const statusEl = document.getElementById('save-status');
     statusEl.textContent = '記録を保存中…';
@@ -1218,6 +1248,7 @@
       await addDoc(collection(db, 'users', currentUser.uid, 'records'), {
         mode: 'voice',
         keyword,
+        text,
         chars,
         elapsed,
         cpm,
@@ -1353,6 +1384,9 @@
           <td class="history-rate">${d.inclusion != null ? d.inclusion + '%' : '—'}</td>
           <td class="history-num">${d.cpm ?? '—'}</td>
           <td class="history-num">${elapsed}</td>
+          <td class="history-action">${d.text
+            ? `<button class="history-retry-btn" onclick="retryFromHistory(this)" data-text="${escHtml(d.text)}" data-kw="${escHtml(d.keyword)}"><i class="ti ti-repeat"></i> もう一度</button>`
+            : '<span class="history-no-retry">—</span>'}</td>
         `;
         tbody.appendChild(tr);
       });

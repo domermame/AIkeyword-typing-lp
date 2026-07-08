@@ -408,6 +408,15 @@
     .history-date { color: var(--color-text-secondary); white-space: nowrap; }
     .history-num { text-align: right; font-variant-numeric: tabular-nums; }
     .history-cpm { font-weight: 500; color: var(--color-purple); }
+    .history-action { text-align: center; }
+    .history-retry-btn {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 10px; font-size: 12px; font-family: inherit; white-space: nowrap;
+      background: none; border: 0.5px solid var(--color-purple); color: var(--color-purple);
+      border-radius: var(--radius-md); cursor: pointer;
+    }
+    .history-retry-btn:hover { background: var(--color-purple-bg); }
+    .history-no-retry { color: var(--color-text-secondary); font-size: 12px; }
     .kw-cell { display: flex; align-items: center; gap: 4px; }
     .kw-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }
     .kw-edit-btn {
@@ -543,6 +552,7 @@
             <th style="text-align:right">文字数</th>
             <th style="text-align:right">文字/分</th>
             <th style="text-align:right">時間</th>
+            <th style="text-align:center">操作</th>
           </tr>
         </thead>
         <tbody id="history-body"></tbody>
@@ -911,6 +921,23 @@
     document.getElementById('custom-toggle-icon').className = 'ti ti-chevron-down';
   };
 
+  /* ── 履歴からもう一度 ── */
+  window.retryFromHistory = function(btn) {
+    const text = btn.dataset.text;
+    const kw   = btn.dataset.kw;
+    if (!text) return;
+    resetTimer();
+    finished = false;
+    paused   = false;
+    currentKw   = kw;
+    currentText = text;
+    document.getElementById('demo-error').style.display = 'none';
+    document.getElementById('wiki-credit').style.display = 'none';
+    document.getElementById('kw-input').value = '';
+    startPractice();
+    document.querySelector('.practice-box').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   /* ────────── Firestore ────────── */
 
   async function saveRecord(keyword, text, chars, elapsed, cpm) {
@@ -923,6 +950,7 @@
       await addDoc(ref, {
         mode: 'keyboard',
         keyword,
+        text,
         chars,
         elapsed,
         cpm,
@@ -1049,6 +1077,9 @@
           <td class="history-num">${d.chars ?? '—'}</td>
           <td class="history-num history-cpm">${d.cpm ?? '—'}</td>
           <td class="history-num">${elapsed}</td>
+          <td class="history-action">${d.text
+            ? `<button class="history-retry-btn" onclick="retryFromHistory(this)" data-text="${escHtml(d.text)}" data-kw="${escHtml(d.keyword)}"><i class="ti ti-repeat"></i> もう一度</button>`
+            : '<span class="history-no-retry">—</span>'}</td>
         `;
         tbody.appendChild(tr);
       });
