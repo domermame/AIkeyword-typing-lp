@@ -584,7 +584,7 @@
     .problem-card p { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
 
     /* ---- Flow ---- */
-    .flow { display: flex; flex-direction: column; margin-bottom: 1rem; }
+    .flow { display: flex; flex-direction: column; margin: 0 auto 1rem; max-width: 620px; }
     .flow-step {
       display: flex;
       gap: 18px;
@@ -678,25 +678,25 @@
     /* ---- Graph ---- */
     .graph-section { padding: 0 1.5rem 2.5rem; }
     .graph-label { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 1rem; text-align: center; }
-    .speed-bars { display: flex; flex-direction: column; gap: 10px; }
-    .speed-row { display: flex; align-items: center; gap: 12px; }
-    .speed-row .wk { font-size: 12px; color: var(--color-text-secondary); width: 42px; flex-shrink: 0; }
-    .speed-bar-wrap {
-      flex: 1;
-      background: var(--color-bg-secondary);
-      border-radius: 6px;
-      height: 24px;
-      overflow: hidden;
+    .line-chart-wrap {
+      max-width: 640px;
+      margin: 0 auto;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.25rem 0.75rem;
+      box-shadow: var(--shadow-sm);
     }
-    .speed-bar {
-      height: 100%;
-      background: linear-gradient(90deg, #6c63e0 0%, #534ab7 100%);
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      padding-left: 10px;
+    .line-chart { width: 100%; height: auto; display: block; }
+    .chart-point-label {
+      font-size: 13px;
+      font-weight: 700;
+      fill: var(--color-purple);
     }
-    .speed-bar span { font-size: 11px; color: #fff; font-weight: 600; }
+    .chart-axis-label {
+      font-size: 11px;
+      fill: var(--color-text-secondary);
+    }
 
     /* ---- CTA bottom ---- */
     .cta-bottom {
@@ -780,7 +780,7 @@
 
   <!-- Hero Banner -->
   <section class="hero-banner">
-    <img src="banner.png" alt="キーワードで、速く、正確に。伝える力を支えるタイピング力を。" />
+    <img src="topbanner3.png" alt="キーワードで、速く、正確に。伝える力を支えるタイピング力を。" />
     <div class="banner-cta">
       <a class="btn-primary" href="login.html">ログイン &rarr;</a>
       <a class="btn-secondary" href="#demo">デモを試す ↓</a>
@@ -797,15 +797,15 @@
         <div class="demo-card-icon"><i class="ti ti-keyboard" aria-hidden="true"></i></div>
         <div class="demo-card-body">
           <div class="demo-card-badge">このページで体験</div>
-          <h3>キーボード入力デモ</h3>
-          <p>キーワードを入力するとAIが練習文を生成。画面を見ながらタイピング練習できます。</p>
+          <h3>見ながら入力練習 デモ</h3>
+          <p>キーワードを入力すると自動で練習文を生成。画面を見ながらタイピング練習できます。</p>
         </div>
       </button>
       <button type="button" class="demo-card demo-card-link" id="tab-voice" onclick="switchDemo('voice')">
         <div class="demo-card-icon voice"><i class="ti ti-volume" aria-hidden="true"></i></div>
         <div class="demo-card-body">
           <div class="demo-card-badge voice">このページで体験</div>
-          <h3>音声読み上げデモ</h3>
+          <h3>音声読み上げ入力練習 デモ</h3>
           <p>生成した練習文を音声で読み上げ。<strong>聴きながら入力する</strong>本番さながらの練習ができます。</p>
         </div>
       </button>
@@ -1006,6 +1006,11 @@
         <h3>単語を覚えにくい</h3>
         <p>読むだけの学習では定着しない。手を動かしながら意味も覚えたい</p>
       </div>
+      <div class="problem-card">
+        <div class="icon"><i class="ti ti-headphones" aria-hidden="true"></i></div>
+        <h3>本番を想定した入力練習ができない</h3>
+        <p>練習文を見て入力するのではなく、読み上げてもらって練習がしたい</p>
+      </div>
     </div>
   </section>
 
@@ -1020,22 +1025,22 @@
       <div class="flow-step">
         <div class="flow-num">1</div>
         <div class="flow-content">
-          <h3>キーワードを入力する</h3>
-          <p>講演テーマや学習したい専門用語を入力。複数のキーワードをまとめて入れることもできます。</p>
+          <h3>練習モードを選択</h3>
+          <p>「見ながら入力」か「音声読み上げ入力」かを選びます。</p>
         </div>
       </div>
       <div class="flow-step">
         <div class="flow-num">2</div>
         <div class="flow-content">
-          <h3>AIが練習文を自動生成</h3>
-          <p>キーワードの意味や使い方を含んだ自然な文章をAIが作成。読み上げ音声も同時に生成されます。</p>
+          <h3>練習問題文をつくる</h3>
+          <p>キーワードを入力して自動生成するか、自分の好きな文章を貼り付けて問題を作成します。</p>
         </div>
       </div>
       <div class="flow-step">
         <div class="flow-num">3</div>
         <div class="flow-content">
           <h3>タイピング練習 ＆ 記録を確認</h3>
-          <p>文章を見ながら、または音声を聞きながら入力練習。速度・正確率の伸びをグラフで確認できます。</p>
+          <p>文章を見ながら、または音声を聞きながら入力練習。速度・文字包含率の伸びをグラフで確認できます。</p>
         </div>
       </div>
     </div>
@@ -1050,7 +1055,7 @@
     <div class="features">
       <div class="feature">
         <div class="fi"><i class="ti ti-sparkles" aria-hidden="true"></i></div>
-        <h3>AI文章生成</h3>
+        <h3>文章自動作成</h3>
         <p>キーワードから自動で練習用テキストを作成。毎回異なる文章で飽きずに続けられる</p>
       </div>
       <div class="feature">
@@ -1067,16 +1072,6 @@
         <div class="fi"><i class="ti ti-user" aria-hidden="true"></i></div>
         <h3>ログイン機能</h3>
         <p>アカウントに紐づいた練習履歴。複数デバイスでも記録が引き継がれる</p>
-      </div>
-      <div class="feature">
-        <div class="fi"><i class="ti ti-folder" aria-hidden="true"></i></div>
-        <h3>セット保存</h3>
-        <p>よく使うキーワードセットを保存。次の現場の前にすぐ呼び出して練習再開</p>
-      </div>
-      <div class="feature">
-        <div class="fi"><i class="ti ti-adjustments" aria-hidden="true"></i></div>
-        <h3>難易度調整</h3>
-        <p>文章の長さや語彙の難しさを調整。初心者から上級者まで使える</p>
       </div>
     </div>
   </section>
@@ -1109,12 +1104,26 @@
   <div class="graph-section">
     <div style="text-align:center;margin-bottom:0.5rem"><div class="section-chip">✦ GROWTH</div></div>
     <div class="section-title" style="margin-bottom:0.5rem;">上達を実感できる</div>
-    <div class="graph-label">1ヶ月間のタイピング速度の推移（例）</div>
-    <div class="speed-bars">
-      <div class="speed-row"><span class="wk">1週目</span><div class="speed-bar-wrap"><div class="speed-bar" style="width:53%"><span>80字/分</span></div></div></div>
-      <div class="speed-row"><span class="wk">2週目</span><div class="speed-bar-wrap"><div class="speed-bar" style="width:60%"><span>90字/分</span></div></div></div>
-      <div class="speed-row"><span class="wk">3週目</span><div class="speed-bar-wrap"><div class="speed-bar" style="width:73%"><span>110字/分</span></div></div></div>
-      <div class="speed-row"><span class="wk">4週目</span><div class="speed-bar-wrap"><div class="speed-bar" style="width:80%"><span>120字/分</span></div></div></div>
+    <div class="graph-label">20日間のタイピング速度の推移（例）</div>
+    <div class="line-chart-wrap">
+      <svg viewBox="0 0 700 230" class="line-chart" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <linearGradient id="growthFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--color-purple)" stop-opacity="0.28" />
+            <stop offset="100%" stop-color="var(--color-purple)" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+        <polygon points="40,200 40,182 73.7,174.8 107.4,164 141.1,171.2 174.7,153.2 208.4,146 242.1,138.8 275.8,149.6 309.5,131.6 343.2,120.8 376.8,128 410.5,110 444.2,99.2 477.9,106.4 511.6,88.4 545.3,77.6 578.9,84.8 612.6,66.8 646.3,52.4 680,38 680,200" fill="url(#growthFill)" />
+        <polyline points="40,182 73.7,174.8 107.4,164 141.1,171.2 174.7,153.2 208.4,146 242.1,138.8 275.8,149.6 309.5,131.6 343.2,120.8 376.8,128 410.5,110 444.2,99.2 477.9,106.4 511.6,88.4 545.3,77.6 578.9,84.8 612.6,66.8 646.3,52.4 680,38"
+          fill="none" stroke="var(--color-purple)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" />
+        <circle cx="40" cy="182" r="5" fill="var(--color-purple)" />
+        <circle cx="680" cy="38" r="5" fill="var(--color-purple)" />
+        <text x="40" y="168" class="chart-point-label" text-anchor="start">80字/分</text>
+        <text x="680" y="26" class="chart-point-label" text-anchor="end">120字/分</text>
+        <text x="40" y="222" class="chart-axis-label" text-anchor="start">1日目</text>
+        <text x="343" y="222" class="chart-axis-label" text-anchor="middle">10日目</text>
+        <text x="680" y="222" class="chart-axis-label" text-anchor="end">20日目</text>
+      </svg>
     </div>
   </div>
 
