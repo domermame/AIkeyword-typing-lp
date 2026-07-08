@@ -375,6 +375,14 @@
     .stat.finished { border-color: var(--color-purple); background: var(--color-purple-bg); }
     .stat.finished .val { color: var(--color-purple); }
 
+    /* ── Tip ── */
+    .tip {
+      background: var(--color-bg-info); border-radius: var(--radius-md);
+      padding: 1rem 1.25rem; font-size: 13px; color: var(--color-text-info);
+      display: flex; gap: 10px; align-items: flex-start; margin-bottom: 0.75rem;
+    }
+    .tip i { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+
     /* ── 保存ステータス ── */
     .save-status {
       display: none; font-size: 12px; color: var(--color-teal);
@@ -680,6 +688,12 @@
         <div class="stat" id="s-rate"><div class="val" id="stat-rate">—</div><div class="lbl">文字包含率</div></div>
         <div class="stat" id="s-wpm"><div class="val" id="stat-wpm">—</div><div class="lbl">文字/分</div></div>
         <div class="stat" id="s-time"><div class="val" id="stat-time">0:00</div><div class="lbl">経過時間</div></div>
+      </div>
+
+      <!-- Tip -->
+      <div class="tip">
+        <i class="ti ti-info-circle"></i>
+        <span>音声読み上げにはブラウザ内蔵の音声合成を使用しています。要約筆記の本番練習に近い環境が作れます。速度は読み上げ前に選んでください。<br><br>「文字包含率」は、入力した各文字が問題文に何文字含まれているかを重複込みでカウントして評価しています。順番は問わないため、キーワードをどれだけ拾えたかの目安になります。</span>
       </div>
       <div class="save-status" id="save-status"></div>
     </div>
